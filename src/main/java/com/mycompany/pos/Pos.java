@@ -4,13 +4,20 @@
 
 package com.mycompany.pos;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+
 /**
  *
  * @author talat
  */
 public class Pos {
 
-    public static void main(String[] args) {
-        System.out.println("Hello World!");
+    public static void main(String[] args)  throws IOException
+    {
+        new LoginForm();
     }
 }
