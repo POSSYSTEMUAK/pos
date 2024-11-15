@@ -5,7 +5,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -13,40 +15,54 @@ public class LoginAdmin extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Create a grid layout for the login form
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 20, 20, 20));
+        // Main layout
+        BorderPane mainLayout = new BorderPane();
+        mainLayout.setStyle("-fx-background-color: lightpink;"); // Set light pink background color
+
+        // Left Section: Add an image
+        Image image = new Image("file:C:/Users/talat/IdeaProjects/pos/app.jpg");
+        ImageView imageView = new ImageView(image);
+        imageView.setPreserveRatio(true);
+        imageView.setFitWidth(300); // Set a preferred width for the image
+        VBox leftBox = new VBox(imageView);
+        leftBox.setAlignment(Pos.CENTER);
+        leftBox.setPadding(new Insets(20));
+        mainLayout.setLeft(leftBox);
+
+        // Right Section: Create a grid layout for the login form
+        GridPane loginGrid = new GridPane();
+        loginGrid.setAlignment(Pos.CENTER);
+        loginGrid.setHgap(10);
+        loginGrid.setVgap(10);
+        loginGrid.setPadding(new Insets(20, 20, 20, 20));
 
         // Add Title
-        Label titleLabel = new Label("Login");
+        Label titleLabel = new Label("Super Admin");
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        grid.add(titleLabel, 0, 0, 2, 1);
+        loginGrid.add(titleLabel, 0, 0, 2, 1);
 
         // Add Username Field
         Label usernameLabel = new Label("Username:");
-        grid.add(usernameLabel, 0, 1);
+        loginGrid.add(usernameLabel, 0, 1);
         TextField usernameField = new TextField();
         usernameField.setPromptText("Enter username");
-        grid.add(usernameField, 1, 1);
+        loginGrid.add(usernameField, 1, 1);
 
         // Add Password Field
         Label passwordLabel = new Label("Password:");
-        grid.add(passwordLabel, 0, 2);
+        loginGrid.add(passwordLabel, 0, 2);
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Enter password");
-        grid.add(passwordField, 1, 2);
+        loginGrid.add(passwordField, 1, 2);
 
         // Add Login Button
         Button loginButton = new Button("Login");
-        grid.add(loginButton, 1, 3);
+        loginGrid.add(loginButton, 1, 3);
 
         // Add Message Label for Feedback
         Label messageLabel = new Label();
         messageLabel.setTextFill(Color.RED);
-        grid.add(messageLabel, 0, 4, 2, 1);
+        loginGrid.add(messageLabel, 0, 4, 2, 1);
 
         // Set Login Button Action
         loginButton.setOnAction(e -> {
@@ -63,8 +79,10 @@ public class LoginAdmin extends Application {
             }
         });
 
+        mainLayout.setCenter(loginGrid);
+
         // Set up the scene and stage
-        Scene scene = new Scene(grid, 400, 250);
+        Scene scene = new Scene(mainLayout, 900, 600);
         primaryStage.setTitle("Login Screen");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -81,4 +99,3 @@ public class LoginAdmin extends Application {
         launch(args);
     }
 }
-

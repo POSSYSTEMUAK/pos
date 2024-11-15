@@ -20,7 +20,7 @@ public class LoginBranch extends Application {
         mainLayout.setStyle("-fx-background-color: lightpink;"); // Set light pink background color
 
         // Left Section: Add an image
-        Image image = new Image("C://Users//talat//IdeaProjects//pos//images//app.jpg"); // Replace with your image path
+        Image image = new Image("file:C:/Users/talat/IdeaProjects/pos/app.jpg");
         ImageView imageView = new ImageView(image);
         imageView.setPreserveRatio(true);
         imageView.setFitWidth(300); // Set a preferred width for the image
@@ -37,7 +37,7 @@ public class LoginBranch extends Application {
         loginGrid.setPadding(new Insets(20, 20, 20, 20));
 
         // Add Title
-        Label titleLabel = new Label("Login");
+        Label titleLabel = new Label("Branch Manager");
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         loginGrid.add(titleLabel, 0, 0, 2, 1);
 
