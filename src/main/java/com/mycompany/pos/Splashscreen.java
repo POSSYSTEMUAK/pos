@@ -11,33 +11,90 @@ package com.mycompany.pos;
 import javax.swing.*;
 import java.awt.*;
 
-public class Splashscreen extends JWindow {
+import static javax.swing.GroupLayout.Alignment.CENTER;
 
-    public Splashscreen(int duration) {
+public class Splashscreen extends JWindow
+{
+
+    public Splashscreen(int duration)
+    {
         // Display the splash screen for the specified duration in milliseconds
         showSplash(duration);
     }
 
-    private void showSplash(int duration) {
+    private void showSplash(int duration)
+    {
         JPanel content = (JPanel) getContentPane();
         content.setBackground(Color.white);
 
         // Set the splash screen size
-        int width = 400;
-        int height = 250;
+        int width = 500;
+        int height = 300;
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         int x = (screen.width - width) / 2;
         int y = (screen.height - height) / 2;
         setBounds(x, y, width, height);
 
         // Customize the splash screen content
-        JLabel label = new JLabel(new ImageIcon("path/to/your/image.png")); // Replace with your image path
-        JLabel text = new JLabel("Welcome to My Application", JLabel.CENTER);
+        JLabel label = new JLabel(new ImageIcon("metro icon.png")); // Replace with your image path
+        JLabel text = new JLabel("WELCOME TO METRO CASH AND CARRY", JLabel.CENTER);
         text.setFont(new Font("Sans-Serif", Font.BOLD, 20));
+        text.setForeground(Color.gray);
         text.setForeground(Color.blue);
 
-        content.add(label, BorderLayout.CENTER);
-        content.add(text, BorderLayout.SOUTH);
+        JProgressBar progressBar = new JProgressBar();
+        progressBar.setMinimum(0);
+        progressBar.setMaximum(100);
+        progressBar.setValue(0);
+        progressBar.setStringPainted(true);
+        progressBar.setBorder(BorderFactory.createLineBorder(Color.blue));
+        progressBar.setForeground(Color.blue);
+
+        //label.setHorizontalAlignment(SwingConstants.CENTER);
+
+
+
+        /////////////////////////////////////////////////////////////////////
+
+
+
+
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+
+
+
+        content.add(Box.createVerticalStrut(10));
+        content.add(text);
+        content.add(Box.createVerticalStrut(10));
+        content.add(label);
+        content.add(Box.createVerticalStrut(10));
+        content.add(progressBar);
+
+
+
+        // Simulate task and update progress bar
+        for (int i = 0; i <= 100; i++) {
+            progressBar.setValue(i); // Update progress bar value
+            try {
+                Thread.sleep(duration / 5000); // Wait for a short duration to simulate progress
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        // Wait for the specified duration
+        try {
+            Thread.sleep(1000); // Give some time before closing the splash screen
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Close the splash screen
+        setVisible(false);
+        dispose();
+
+
 
         // Add a border around the splash screen
         content.setBorder(BorderFactory.createLineBorder(Color.blue, 5));
@@ -46,9 +103,13 @@ public class Splashscreen extends JWindow {
         setVisible(true);
 
         // Wait for the specified duration
-        try {
+        try
+        {
+
             Thread.sleep(duration);
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
             e.printStackTrace();
         }
 
@@ -57,14 +118,6 @@ public class Splashscreen extends JWindow {
         dispose();
     }
 
-    public static void main(String[] args) {
-        // Display splash screen for 3 seconds
-        new Splashscreen(3000);
 
-        // Launch the main application
-        JFrame mainFrame = new JFrame("Main Application");
-        mainFrame.setSize(800, 600);
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.setVisible(true);
-    }
+
 }

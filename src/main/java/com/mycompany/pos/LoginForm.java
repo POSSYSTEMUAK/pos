@@ -25,12 +25,12 @@ public class LoginForm extends JFrame
 
         f1Panel.setBorder(new LineBorder(Color.black, 1));
         f1Panel.setBackground(Color.getHSBColor(194.7F, 24.8F, 90.2F));
-        f1Panel.setBounds(0, 0, 800, 800);
+        f1Panel.setBounds(0, 0, 600, 800);
 
         f2Panel.setLayout(new BorderLayout());
         f2Panel.setBorder(new LineBorder(Color.black, 0));
         f2Panel.setBackground(Color.WHITE);
-        f2Panel.setBounds(800, 0, 800, 800);
+        f2Panel.setBounds(600, 0, 950, 800);
 
 
 
@@ -47,6 +47,7 @@ public class LoginForm extends JFrame
         chooseEntitylabel.setVerticalAlignment(SwingConstants.TOP);
         chooseEntitylabel.setForeground(Color.BLACK);
         chooseEntitylabel.setLayout(null);
+        chooseEntitylabel.setBorder(new LineBorder(Color.black,2));
 
         // PANEL F1PANEL SETTING AND ALLIGNING:
         JButton superAdminBtn = new JButton("SUPER ADMIN");
@@ -62,37 +63,34 @@ public class LoginForm extends JFrame
         groupLayout.setAutoCreateGaps(true);
         groupLayout.setAutoCreateContainerGaps(true);
         groupLayout.linkSize(SwingConstants.VERTICAL, superAdminBtn,branchManagerBtn,dataEntryOperatorBtn,cashierBtn);
+        groupLayout.linkSize(SwingConstants.HORIZONTAL, superAdminBtn,branchManagerBtn,dataEntryOperatorBtn,cashierBtn);
 
 
         groupLayout.setHorizontalGroup(
                 groupLayout.createSequentialGroup()
-                        .addGroup(groupLayout.createParallelGroup(LEADING)
+                        .addGroup(groupLayout.createParallelGroup(CENTER)
                                 .addComponent(chooseEntitylabel)
-                                .addComponent(superAdminBtn)
-                                .addComponent(branchManagerBtn)
-                                .addComponent(dataEntryOperatorBtn)
-                                .addComponent(cashierBtn))
+                                .addComponent(superAdminBtn,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(branchManagerBtn,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(dataEntryOperatorBtn,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(cashierBtn,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         // Set Vertical Group (Arrange components vertically)
         groupLayout.setVerticalGroup(
                 groupLayout.createSequentialGroup()
+                        .addGap(150)
                         .addComponent(chooseEntitylabel)
+                        .addGap(70)
                         .addComponent(superAdminBtn)
+                        .addGap(70)
                         .addComponent(branchManagerBtn)
+                        .addGap(70)
                         .addComponent(dataEntryOperatorBtn)
+                        .addGap(70)
                         .addComponent(cashierBtn)
+                        .addGap(150)
         );
-
-
-
-
-
-
-
-
-
-
 
 
 
