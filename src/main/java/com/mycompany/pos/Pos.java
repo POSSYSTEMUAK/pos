@@ -20,5 +20,7 @@ public class Pos {
     {
         new LoginForm();
         new ResizableWindow();
+
+        //new Splashscreen(5000);
     }
 }
