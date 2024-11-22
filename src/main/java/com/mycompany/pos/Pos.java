@@ -18,9 +18,12 @@ public class Pos {
 
     public static void main(String[] args)  throws IOException
     {
-       new LoginForm();
-       //new BranchManager();
+
+        //new ResizableWindow();
+        //new BranchManager();
+
          new Splashscreen(5000);
+        //new BranchManager();
 
     }
 }

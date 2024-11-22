@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import static javax.swing.GroupLayout.Alignment.*;
+import javax.swing.border.Border;
 
 
 
@@ -24,7 +25,7 @@ public class LoginForm extends JFrame
         JPanel f2Panel = new JPanel();
 
         f1Panel.setBorder(new LineBorder(Color.black, 1));
-        f1Panel.setBackground(Color.getHSBColor(194.7F, 24.8F, 90.2F));
+        f1Panel.setBackground(Color.getHSBColor(15, 231, 65));
         f1Panel.setBounds(0, 0, 600, 800);
 
         f2Panel.setLayout(new BorderLayout());
@@ -51,9 +52,27 @@ public class LoginForm extends JFrame
 
         // PANEL F1PANEL SETTING AND ALLIGNING:
         JButton superAdminBtn = new JButton("SUPER ADMIN");
+        superAdminBtn.setBounds(40, 30, 20, 5);
+        superAdminBtn.setBorder(new RoundedBorder(10));
+        superAdminBtn.setBackground(new Color(153,102,0));
+
+
         JButton branchManagerBtn = new JButton("BRANCH MANAGER");
+        branchManagerBtn.setBounds(40, 30, 20, 5);
+        branchManagerBtn.setBorder(new RoundedBorder(10));
+        branchManagerBtn.setBackground(new Color(153,102,0));
+
+
         JButton dataEntryOperatorBtn = new JButton("DATA ENTRY OPERATOR");
+        dataEntryOperatorBtn.setBounds(40, 30, 20, 5);
+        dataEntryOperatorBtn.setBorder(new RoundedBorder(10));
+        dataEntryOperatorBtn.setBackground(new Color(153,102,0));
+
+
         JButton cashierBtn = new JButton("CASHIER");
+        cashierBtn.setBounds(40, 30, 20, 5);
+        cashierBtn.setBorder(new RoundedBorder(10));
+        cashierBtn.setBackground(new Color(153,102,0));
 
 
 

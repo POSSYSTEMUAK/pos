@@ -1,46 +1,38 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.pos;
 
-/**
- *
- * @author talat
- */
+
 import javax.swing.*;
 import java.awt.*;
-
-import static javax.swing.GroupLayout.Alignment.CENTER;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class Splashscreen extends JWindow
 {
 
     public Splashscreen(int duration)
     {
-        // Display the splash screen for the specified duration in milliseconds
         showSplash(duration);
     }
 
-    private void showSplash(int duration)
-    {
+    private void showSplash(int duration) {
+
         JPanel content = (JPanel) getContentPane();
         content.setBackground(Color.white);
 
-        // Set the splash screen size
+        //SPLASH SCREEN SIZE N POSITION:
         int width = 500;
-        int height = 300;
+        int height = 250;
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         int x = (screen.width - width) / 2;
         int y = (screen.height - height) / 2;
         setBounds(x, y, width, height);
 
-        // Customize the splash screen content
+
         JLabel label = new JLabel(new ImageIcon("metro icon.png")); // Replace with your image path
         JLabel text = new JLabel("WELCOME TO METRO CASH AND CARRY", JLabel.CENTER);
         text.setFont(new Font("Sans-Serif", Font.BOLD, 20));
-        text.setForeground(Color.gray);
         text.setForeground(Color.blue);
+
 
         JProgressBar progressBar = new JProgressBar();
         progressBar.setMinimum(0);
@@ -50,20 +42,11 @@ public class Splashscreen extends JWindow
         progressBar.setBorder(BorderFactory.createLineBorder(Color.blue));
         progressBar.setForeground(Color.blue);
 
-        //label.setHorizontalAlignment(SwingConstants.CENTER);
-
-
-
-        /////////////////////////////////////////////////////////////////////
-
-
-
 
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-        content.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-
-
+        text.setAlignmentX(Component.CENTER_ALIGNMENT);
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        progressBar.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         content.add(Box.createVerticalStrut(10));
         content.add(text);
@@ -72,52 +55,41 @@ public class Splashscreen extends JWindow
         content.add(Box.createVerticalStrut(10));
         content.add(progressBar);
 
+        // SETTING UP THE BORDER AROUND SPLASH SCREEN:
+        content.setBorder(BorderFactory.createLineBorder(Color.blue, 5));
 
 
-        // Simulate task and update progress bar
+        setVisible(true);
+
+
+        int updateInterval = duration / 100;
         for (int i = 0; i <= 100; i++) {
-            progressBar.setValue(i); // Update progress bar value
+            progressBar.setValue(i);
             try {
-                Thread.sleep(duration / 5000); // Wait for a short duration to simulate progress
+                Thread.sleep(updateInterval);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        // Wait for the specified duration
-        try {
-            Thread.sleep(1000); // Give some time before closing the splash screen
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
-        // Close the splash screen
-        setVisible(false);
-        dispose();
+        new Thread(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(1);           // SPLAS SCREEN RUN FOR 5 SECONDS:
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            // LOGIN PAGE APPEARS AFTER SPLASH SCREEN IS EXITTED:
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    new LoginForm().setVisible(true);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            dispose();
+        }).start();
 
-
-
-        // Add a border around the splash screen
-        content.setBorder(BorderFactory.createLineBorder(Color.blue, 5));
-
-        // Display the splash screen
-        setVisible(true);
-
-        // Wait for the specified duration
-        try
-        {
-
-            Thread.sleep(duration);
-        }
-        catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-
-        // Close the splash screen
-        setVisible(false);
-        dispose();
     }
-
 
 
 }
