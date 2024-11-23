@@ -18,56 +18,57 @@ public class SuperAdmin extends Application {
 
         // Header Section
         Label header = new Label("Super Admin Dashboard");
-        header.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #4B0082;");
+        header.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #000000;");
 
         // Branch Management Section
         Label branchLabel = new Label("Branch Management");
-        branchLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2E8B57;");
+        branchLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #000000;");
 
         TextField branchID = new TextField();
         branchID.setPromptText("Branch ID");
-        branchID.setMaxWidth(250); // Restrict width
+        branchID.setMaxWidth(250);
 
         TextField branchName = new TextField();
         branchName.setPromptText("Branch Name");
-        branchName.setMaxWidth(250); // Restrict width
+        branchName.setMaxWidth(250);
 
         TextField branchCity = new TextField();
         branchCity.setPromptText("City");
-        branchCity.setMaxWidth(250); // Restrict width
+        branchCity.setMaxWidth(250);
 
         Button addBranchButton = new Button("Add Branch");
         Button editBranchButton = new Button("Edit Branch");
-        HBox branchButtons = new HBox(10, addBranchButton, editBranchButton);
-        branchButtons.setAlignment(Pos.CENTER);
 
-        VBox branchSection = new VBox(10, branchLabel, branchID, branchName, branchCity, branchButtons);
-        branchSection.setPadding(new Insets(10));
-        branchSection.setAlignment(Pos.CENTER); // Center the contents
-        branchSection.setVisible(false);
+        VBox branchSection = new VBox(10, branchLabel, branchID, branchName, branchCity, addBranchButton, editBranchButton);
+        branchSection.setAlignment(Pos.CENTER);
+        branchSection.setVisible(false); // Initially hidden
 
         // Branch Manager Section
         Label managerLabel = new Label("Branch Manager Management");
-        managerLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2E8B57;");
+        managerLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #000000;");
 
         TextField managerName = new TextField();
         managerName.setPromptText("Manager Name");
-        managerName.setMaxWidth(250); // Restrict width
+        managerName.setMaxWidth(250);
 
         TextField managerBranchID = new TextField();
         managerBranchID.setPromptText("Branch ID");
-        managerBranchID.setMaxWidth(250); // Restrict width
+        managerBranchID.setMaxWidth(250);
 
         Button assignManagerButton = new Button("Assign Manager");
 
         VBox managerSection = new VBox(10, managerLabel, managerName, managerBranchID, assignManagerButton);
-        managerSection.setPadding(new Insets(10));
-        managerSection.setAlignment(Pos.CENTER); // Center the contents
-        managerSection.setVisible(false);
+        managerSection.setAlignment(Pos.CENTER);
+        managerSection.setVisible(false); // Initially hidden
+
+        // StackPane to overlay the sections
+        StackPane contentPane = new StackPane(branchSection, managerSection);
+        contentPane.setAlignment(Pos.CENTER);
+        contentPane.setPadding(new Insets(20));
 
         // Buttons for toggling sections
-        Button branchManagementButton = new Button("Branch Management");
-        Button branchManagerButton = new Button("Branch Manager Management");
+        Button branchManagementButton = new Button("Branch");
+        Button branchManagerButton = new Button("Manager");
 
         branchManagementButton.setOnAction(e -> {
             branchSection.setVisible(true);
@@ -83,10 +84,11 @@ public class SuperAdmin extends Application {
         toggleButtons.setAlignment(Pos.CENTER);
 
         // Main Layout
-        VBox layout = new VBox(20, header, toggleButtons, branchSection, managerSection);
+        VBox layout = new VBox(20, header, toggleButtons, contentPane);
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.TOP_CENTER);
-        layout.setStyle("-fx-background-color: #F5F5F5;");
+        layout.setStyle("-fx-background-color: #FFFFFF;");
+        // Light blue background
 
         // Set up the scene and stage
         Scene scene = new Scene(layout, 800, 600); // Adjusted size for better view

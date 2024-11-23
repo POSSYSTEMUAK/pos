@@ -7,8 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 public class BranchManager extends Application {
@@ -17,13 +16,13 @@ public class BranchManager extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Branch Manager Dashboard");
 
-        // Header
+        // Header Section
         Label header = new Label("Branch Manager Dashboard");
-        header.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #4B0082;");
+        header.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #000000;");
 
         // Cashier Management Section
         Label cashierLabel = new Label("Cashier Management");
-        cashierLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2E8B57;");
+        cashierLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #000000;");
 
         TextField cashierName = new TextField();
         cashierName.setPromptText("Cashier Name");
@@ -37,13 +36,12 @@ public class BranchManager extends Application {
         Button resetCashierPasswordButton = new Button("Reset Password");
 
         VBox cashierSection = new VBox(10, cashierLabel, cashierName, cashierRole, addCashierButton, resetCashierPasswordButton);
-        cashierSection.setPadding(new Insets(10));
         cashierSection.setAlignment(Pos.CENTER);
         cashierSection.setVisible(false); // Initially hidden
 
         // Data Entry Operator Management Section
         Label operatorLabel = new Label("Data Entry Operator Management");
-        operatorLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2E8B57;");
+        operatorLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #000000;");
 
         TextField operatorName = new TextField();
         operatorName.setPromptText("Operator Name");
@@ -57,13 +55,17 @@ public class BranchManager extends Application {
         Button resetOperatorPasswordButton = new Button("Reset Password");
 
         VBox operatorSection = new VBox(10, operatorLabel, operatorName, operatorRole, addOperatorButton, resetOperatorPasswordButton);
-        operatorSection.setPadding(new Insets(10));
         operatorSection.setAlignment(Pos.CENTER);
         operatorSection.setVisible(false); // Initially hidden
 
-        // Buttons to Toggle Sections
-        Button cashierManagementButton = new Button("Cashier Management");
-        Button operatorManagementButton = new Button("Data Entry Operator Management");
+        // StackPane to overlay the sections
+        StackPane contentPane = new StackPane(cashierSection, operatorSection);
+        contentPane.setAlignment(Pos.CENTER);
+        contentPane.setPadding(new Insets(20));
+
+        // Buttons for toggling sections
+        Button cashierManagementButton = new Button("Cashier");
+        Button operatorManagementButton = new Button("Data Entry Operator");
 
         cashierManagementButton.setOnAction(e -> {
             cashierSection.setVisible(true);
@@ -79,12 +81,12 @@ public class BranchManager extends Application {
         toggleButtons.setAlignment(Pos.CENTER);
 
         // Main Layout
-        VBox layout = new VBox(20, header, toggleButtons, cashierSection, operatorSection);
+        VBox layout = new VBox(20, header, toggleButtons, contentPane);
         layout.setPadding(new Insets(20));
-        layout.setAlignment(Pos.TOP_CENTER);
-        layout.setStyle("-fx-background-color: #F5F5F5;");
+        layout.setAlignment(Pos.TOP_CENTER); // Center everything at the top
+        layout.setStyle("-fx-background-color: #FFFFFF;"); // White background color
 
-        // Scene Setup
+        // Set up the scene and stage
         Scene scene = new Scene(layout, 800, 600);
         primaryStage.setScene(scene);
         primaryStage.show();
