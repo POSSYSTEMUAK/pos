@@ -9,8 +9,18 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
 
 public class BranchManager extends Application {
+
+    private final MongoCollection<Document> employeeCollection;
+
+    public BranchManager() {
+        // Use the existing DatabaseConnection to get the MongoDB collection
+        DatabaseConnection dbConnection = new DatabaseConnection();
+        this.employeeCollection = dbConnection.getEmployeeCollection(); // Assuming getEmployeeCollection() returns the collection
+    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -90,6 +100,36 @@ public class BranchManager extends Application {
         Scene scene = new Scene(layout, 800, 600);
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        // Add Cashier functionality
+        addCashierButton.setOnAction(e -> {
+            String name = cashierName.getText();
+            String role = cashierRole.getText();
+            String password = "defaultPassword123"; // Default password for new cashier
+
+            if (!name.isEmpty() && role.equalsIgnoreCase("Cashier")) {
+                Document employee = new Document("name", name)
+                        .append("role", role)
+                        .append("password", password)
+                        .append("branchId", "branch_id"); // Replace with actual branch ID
+                employeeCollection.insertOne(employee); // Insert into MongoDB
+                System.out.println("Cashier added: " + name + " with role " + role);
+            } else {
+                System.out.println("All fields are required, and role must be 'Cashier'.");
+            }
+        });
+
+        // Reset Cashier Password functionality
+        resetCashierPasswordButton.setOnAction(e -> {
+            String employeeId = "employee_id"; // Replace with actual employee ID
+            String newPassword = "newSecurePassword";
+
+            Document query = new Document("_id", employeeId); // Query to find employee by ID
+            Document update = new Document("$set", new Document("password", newPassword));
+
+            employeeCollection.updateOne(query, update); // Update password in MongoDB
+            System.out.println("Password reset for employee ID: " + employeeId);
+        });
     }
 
     public static void main(String[] args) {
