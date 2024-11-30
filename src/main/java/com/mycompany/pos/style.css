@@ -1,0 +1,30 @@
+/* Common styles for buttons */
+/* General Button Styling */
+.button {
+    -fx-background-color: #007BFF; /* Green button color */
+    -fx-text-fill: white; /* White text color */
+    -fx-font-size: 14px;
+    -fx-padding: 10 20; /* Padding inside the button */
+    -fx-cursor: hand; /* Hand cursor on hover */
+    -fx-background-radius: 20; /* Rounded background */
+    -fx-border-radius: 20; /* Rounded border */
+    -fx-border-color: transparent; /* No border initially */
+    -fx-border-width: 1px; /* Optional: For consistent border size */
+    -fx-effect: dropshadow(gaussian, transparent, 0, 0, 0, 0); /* No shadow by default */
+    -fx-font-weight: bold; /* Bold text for better visibility */
+}
+
+/* Hover Effect for Buttons */
+.button:hover {
+    -fx-background-color: #0056b3; /* Darker green on hover */
+    -fx-text-fill: white; /* Text remains white */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 10, 0.3, 0, 4); /* Box shadow on hover */
+    -fx-scale-x: 1.05; /* Slightly enlarge the button */
+    -fx-scale-y: 1.05; /* Slightly enlarge the button */
+}
+
+/* Optional Active Button Styling */
+.button:pressed {
+    -fx-background-color: #007BFF; /* Even darker green when pressed */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 12, 0.5, 0, 4); /* Stronger shadow on press */
+}
