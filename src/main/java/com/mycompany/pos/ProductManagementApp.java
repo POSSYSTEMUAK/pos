@@ -1,5 +1,7 @@
 package com.mycompany.pos;
 
+import com.mongodb.client.*;
+import com.mongodb.client.model.Filters;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -11,14 +13,27 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
-import java.util.Arrays;
+import org.bson.Document;
 
 public class ProductManagementApp extends Application {
+    private final String MONGO_URI = "mongodb://localhost:27017";
+    private final String DATABASE_NAME = "POS";
+    private final String COLLECTION_NAME = "products";
+
+    private MongoClient mongoClient;
+    private MongoCollection<Document> productCollection;
+
     @Override
     public void start(Stage primaryStage) {
+        // Initialize MongoDB connection
+        mongoClient = MongoClients.create(MONGO_URI);
+        productCollection = mongoClient.getDatabase(DATABASE_NAME).getCollection(COLLECTION_NAME);
+
         // Product List
         ObservableList<Product> products = FXCollections.observableArrayList();
+
+        // Load existing products from MongoDB
+        loadProductsFromDatabase(products);
 
         // Add Product Button
         Button addProductButton = new Button("Add Product");
@@ -26,6 +41,7 @@ public class ProductManagementApp extends Application {
 
         // TableView
         TableView<Product> productTable = new TableView<>(products);
+
         TableColumn<Product, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(data -> data.getValue().nameProperty());
 
@@ -44,7 +60,31 @@ public class ProductManagementApp extends Application {
         TableColumn<Product, String> skuColumn = new TableColumn<>("SKU");
         skuColumn.setCellValueFactory(data -> data.getValue().skuProperty());
 
-        productTable.getColumns().addAll(nameColumn, priceColumn, categoryColumn, descriptionColumn, stockColumn, skuColumn);
+        // Edit Column
+        TableColumn<Product, Void> editColumn = new TableColumn<>("Edit");
+        editColumn.setCellFactory(col -> new TableCell<>() {
+            private final Button editButton = new Button("Edit");
+
+            {
+                styleButton(editButton);
+                editButton.setOnAction(e -> {
+                    Product product = getTableView().getItems().get(getIndex());
+                    openEditProductForm(products, product);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(editButton);
+                }
+            }
+        });
+
+        productTable.getColumns().addAll(nameColumn, priceColumn, categoryColumn, descriptionColumn, stockColumn, skuColumn, editColumn);
 
         // Add Product Button Action
         addProductButton.setOnAction(e -> openAddProductForm(products));
@@ -53,9 +93,7 @@ public class ProductManagementApp extends Application {
         VBox layout = new VBox(10, addProductButton, productTable);
         layout.setPadding(new Insets(10));
 
-        Scene scene = new Scene(layout, 800, 600);
-
-        // CSS Styling
+        Scene scene = new Scene(layout, 900, 600);
         scene.getStylesheets().add("style.css");
 
         primaryStage.setTitle("Product Management");
@@ -63,44 +101,38 @@ public class ProductManagementApp extends Application {
         primaryStage.show();
     }
 
+    private void loadProductsFromDatabase(ObservableList<Product> products) {
+        productCollection.find().forEach(doc -> {
+            products.add(new Product(
+                    doc.getString("name"),
+                    doc.getString("price"),
+                    doc.getString("category"),
+                    doc.getString("description"),
+                    doc.getString("stock"),
+                    doc.getString("sku")
+            ));
+        });
+    }
+
     private void openAddProductForm(ObservableList<Product> products) {
         Stage formStage = new Stage();
         formStage.initModality(Modality.APPLICATION_MODAL);
         formStage.setTitle("Add New Product");
 
-        // Form Fields
         TextField productNameField = new TextField();
         productNameField.setPromptText("Product Name");
 
         TextField productPriceField = new TextField();
         productPriceField.setPromptText("Price");
 
-        ComboBox<String> productCategoryDropdown = new ComboBox<>();
-        ObservableList<String> categories = FXCollections.observableArrayList(
+        ComboBox<String> productCategoryDropdown = new ComboBox<>(FXCollections.observableArrayList(
                 "Fruits", "Vegetables", "Snacks", "Beverages", "Dairy", "Meat", "Household Items", "Personal Care"
-        );
-        productCategoryDropdown.setItems(categories);
+        ));
         productCategoryDropdown.setEditable(true);
         productCategoryDropdown.setPromptText("Category");
 
         TextArea productDescriptionField = new TextArea();
         productDescriptionField.setPromptText("Description");
-        productDescriptionField.setWrapText(true);
-
-        Label charCounter = new Label("0/100");
-        charCounter.setStyle("-fx-font-size: 12px; -fx-text-fill: grey;");
-
-        productDescriptionField.textProperty().addListener((obs, oldText, newText) -> {
-            int charCount = newText.length();
-            charCounter.setText(charCount + "/100");
-
-            if (charCount > 100) {
-                productDescriptionField.setText(oldText); // Revert to old text if limit exceeded
-            }
-
-            // Dynamically adjust height based on content
-            productDescriptionField.setPrefHeight(20 + (charCount / 50) * 20);
-        });
 
         TextField productStockField = new TextField();
         productStockField.setPromptText("Stock Quantity");
@@ -111,7 +143,6 @@ public class ProductManagementApp extends Application {
         Button saveButton = new Button("Save Product");
         styleButton(saveButton);
 
-        // Save Button Action
         saveButton.setOnAction(e -> {
             String name = productNameField.getText();
             String price = productPriceField.getText();
@@ -123,14 +154,17 @@ public class ProductManagementApp extends Application {
             if (!name.isEmpty() && !price.isEmpty() && !category.isEmpty() &&
                     !description.isEmpty() && !stock.isEmpty() && !sku.isEmpty()) {
 
-                // Price Validation
-                if (!price.matches("\\d+(\\.\\d{1,2})?")) { // Regex for numeric input
-                    Alert alert = new Alert(Alert.AlertType.ERROR, "Price must be a numeric value.", ButtonType.OK);
-                    alert.showAndWait();
-                    return;
-                }
+                Product product = new Product(name, price + " PKR", category, description, stock, sku);
+                products.add(product);
 
-                products.add(new Product(name, price + " PKR", category, description, stock, sku));
+                Document doc = new Document("name", name)
+                        .append("price", price + " PKR")
+                        .append("category", category)
+                        .append("description", description)
+                        .append("stock", stock)
+                        .append("sku", sku);
+                productCollection.insertOne(doc);
+
                 formStage.close();
             } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR, "Please fill all fields.", ButtonType.OK);
@@ -138,14 +172,75 @@ public class ProductManagementApp extends Application {
             }
         });
 
-        // Form Layout
         VBox formLayout = new VBox(10,
                 productNameField, productPriceField, productCategoryDropdown, productDescriptionField,
-                charCounter, productStockField, productSKUField, saveButton);
+                productStockField, productSKUField, saveButton);
         formLayout.setPadding(new Insets(10));
 
-        Scene formScene = new Scene(formLayout, 400, 500);
-        formScene.getStylesheets().add("style.css");
+        Scene formScene = new Scene(formLayout, 400, 400);
+        formStage.setScene(formScene);
+        formStage.show();
+    }
+
+    private void openEditProductForm(ObservableList<Product> products, Product product) {
+        Stage formStage = new Stage();
+        formStage.initModality(Modality.APPLICATION_MODAL);
+        formStage.setTitle("Edit Product");
+
+        TextField productNameField = new TextField(product.getName());
+        TextField productPriceField = new TextField(product.getPrice().replace(" PKR", ""));
+        ComboBox<String> productCategoryDropdown = new ComboBox<>(FXCollections.observableArrayList(
+                "Fruits", "Vegetables", "Snacks", "Beverages", "Dairy", "Meat", "Household Items", "Personal Care"
+        ));
+        productCategoryDropdown.setValue(product.getCategory());
+        TextArea productDescriptionField = new TextArea(product.getDescription());
+        TextField productStockField = new TextField(product.getStock());
+        TextField productSKUField = new TextField(product.getSku());
+
+        Button saveButton = new Button("Save Changes");
+        styleButton(saveButton);
+
+        saveButton.setOnAction(e -> {
+            String name = productNameField.getText();
+            String price = productPriceField.getText();
+            String category = productCategoryDropdown.getValue();
+            String description = productDescriptionField.getText();
+            String stock = productStockField.getText();
+            String sku = productSKUField.getText();
+
+            if (!name.isEmpty() && !price.isEmpty() && !category.isEmpty() &&
+                    !description.isEmpty() && !stock.isEmpty() && !sku.isEmpty()) {
+
+                product.setName(name);
+                product.setPrice(price + " PKR");
+                product.setCategory(category);
+                product.setDescription(description);
+                product.setStock(stock);
+                product.setSku(sku);
+
+                products.set(products.indexOf(product), product);
+
+                productCollection.updateOne(Filters.eq("sku", product.getSku()),
+                        new Document("$set", new Document("name", name)
+                                .append("price", price + " PKR")
+                                .append("category", category)
+                                .append("description", description)
+                                .append("stock", stock)
+                                .append("sku", sku)));
+
+                formStage.close();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Please fill all fields.", ButtonType.OK);
+                alert.showAndWait();
+            }
+        });
+
+        VBox formLayout = new VBox(10,
+                productNameField, productPriceField, productCategoryDropdown, productDescriptionField,
+                productStockField, productSKUField, saveButton);
+        formLayout.setPadding(new Insets(10));
+
+        Scene formScene = new Scene(formLayout, 400, 400);
         formStage.setScene(formScene);
         formStage.show();
     }
@@ -186,16 +281,60 @@ class Product {
         return price;
     }
 
+    public String getName() {
+        return name.get();
+    }
+
+    public void setName(String name) {
+        this.name.set(name);
+    }
+
+    public String getPrice() {
+        return price.get();
+    }
+
+    public void setPrice(String price) {
+        this.price.set(formatPrice(price)); // Ensure "PKR" is appended
+    }
+
+    public String getCategory() {
+        return category.get();
+    }
+
+    public void setCategory(String category) {
+        this.category.set(category);
+    }
+
+    public String getDescription() {
+        return description.get();
+    }
+
+    public void setDescription(String description) {
+        this.description.set(description);
+    }
+
+    public String getStock() {
+        return stock.get();
+    }
+
+    public void setStock(String stock) {
+        this.stock.set(stock);
+    }
+
+    public String getSku() {
+        return sku.get();
+    }
+
+    public void setSku(String sku) {
+        this.sku.set(sku);
+    }
+
     public StringProperty nameProperty() {
         return name;
     }
 
     public StringProperty priceProperty() {
         return price;
-    }
-
-    public void setPrice(String price) {
-        this.price.set(formatPrice(price)); // Ensure "PKR" is appended
     }
 
     public StringProperty categoryProperty() {
