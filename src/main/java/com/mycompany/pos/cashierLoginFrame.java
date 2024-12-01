@@ -1,122 +1,111 @@
 package com.mycompany.pos;
 
-import javax.swing.*;
-import java.awt.*;
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
-public class cashierLoginFrame extends JFrame {
-    public cashierLoginFrame() {
-        // Set up the frame
-        setTitle("Cashier Login");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 500); // Adjust size to accommodate all elements
-        setLayout(new BorderLayout()); // Main layout for the frame
+public class cashierLoginFrame extends Application {
 
-        // Create a main container panel with BoxLayout
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.X_AXIS)); // Horizontal layout
+    @Override
+    public void start(Stage primaryStage) {
+        // Main layout with HBox for image and login form
+        HBox mainLayout = new HBox();
+        mainLayout.setSpacing(10); // Minimum spacing between left and right sections
+        mainLayout.setStyle("-fx-background-color: #D8BFD8;");
+        mainLayout.setAlignment(Pos.CENTER); // Center horizontally within HBox
 
-        // Create the left panel for the login form
-        JPanel leftPanel = new JPanel();
-        leftPanel.setLayout(new GridBagLayout()); // Center elements within
-        leftPanel.setBackground(Color.WHITE);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10); // Padding between components
+        // Left Section: Add an image
+        Image image = new Image("file:D:/IdeaProjects/pos/images/pic3.png/");
+        ImageView imageView = new ImageView(image);
+        imageView.setPreserveRatio(true);
+        imageView.setFitWidth(450); // Set a preferred width for the image
+        VBox leftBox = new VBox(imageView);
+        leftBox.setAlignment(Pos.CENTER);
+        leftBox.setPadding(new Insets(0));
+        mainLayout.getChildren().add(leftBox);
 
-        // Create title and subtitle
-        JLabel titleLabel = new JLabel("Cashier");
-        titleLabel.setFont(new Font("Poppins", Font.BOLD, 36));
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        // Right Section: Create a grid layout for the login form
+        GridPane loginGrid = new GridPane();
+        loginGrid.setAlignment(Pos.CENTER);
+        loginGrid.setHgap(10);
+        loginGrid.setVgap(10);
 
-        JLabel subtitleLabel = new JLabel("Login");
-        subtitleLabel.setFont(new Font("Poppins", Font.PLAIN, 26));
-        subtitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        // Add Title
+        Label titleLabel = new Label("Cashier");
+        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        loginGrid.add(titleLabel, 0, 0, 2, 1);
 
-        // Create input fields with rounded borders
-        JTextField userField = new JTextField(15);
-        userField.setPreferredSize(new Dimension(200, 40));
-        userField.setText("username");
-        userField.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.GRAY, 1, true),
-                BorderFactory.createEmptyBorder(5, 10, 5, 10)
-        ));
+        // Add Username Field
+        Label usernameLabel = new Label("Name:");
+        usernameLabel.setStyle("-fx-font-size: 20px;");
+        loginGrid.add(usernameLabel, 0, 1);
+        TextField usernameField = new TextField();
+        usernameField.setStyle("-fx-font-size: 10px; -fx-padding: 10;");
+        usernameField.setPromptText("Enter username");
+        loginGrid.add(usernameField, 1, 1);
 
-        JPasswordField passField = new JPasswordField(15);
-        passField.setPreferredSize(new Dimension(200, 40));
-        passField.setText("password");
-        passField.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.GRAY, 1, true),
-                BorderFactory.createEmptyBorder(5, 10, 5, 10)
-        ));
+        // Add Password Field
+        Label passwordLabel = new Label("Password:");
+        passwordLabel.setStyle("-fx-font-size: 20px;");
+        loginGrid.add(passwordLabel, 0, 2);
+        PasswordField passwordField = new PasswordField();
+        passwordField.setStyle("-fx-font-size: 10px; -fx-padding: 10;");
+        passwordField.setPromptText("Enter password");
+        loginGrid.add(passwordField, 1, 2);
 
-        // Create login button with styling
-        JButton loginButton = new JButton("Login");
-        loginButton.setFont(new Font("Poppins", Font.BOLD, 16));
-        loginButton.setPreferredSize(new Dimension(190, 40));
-        loginButton.setBackground(new Color(100, 149, 237)); // Cornflower blue background
-        loginButton.setForeground(Color.WHITE);
-        loginButton.setFocusPainted(false);
-        loginButton.setBorder(BorderFactory.createEmptyBorder());
-        loginButton.getCursor();
+        // Add Login Button
+        Button loginButton = new Button("Login");
+        loginGrid.add(loginButton, 1, 3);
 
-        // "Back to home screen" label
-        JLabel backLabel = new JLabel("Back to home screen");
-        backLabel.setFont(new Font("Poppins", Font.PLAIN, 12));
-        backLabel.setForeground(Color.BLUE);
-        backLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        // Add Message Label for Feedback
+        Label messageLabel = new Label();
+        messageLabel.setTextFill(Color.RED);
+        loginGrid.add(messageLabel, 0, 4, 2, 1);
 
-        // Add components to the left panel
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
-        leftPanel.add(titleLabel, gbc);
-        gbc.gridy++;
-        leftPanel.add(subtitleLabel, gbc);
-        gbc.gridy++;
-        leftPanel.add(userField, gbc);
-        gbc.gridy++;
-        leftPanel.add(passField, gbc);
-        gbc.gridy++;
-        gbc.gridwidth = 2;
-        leftPanel.add(loginButton, gbc);
-        gbc.gridy++;
-        leftPanel.add(backLabel, gbc);
+        // Set Login Button Action
+        loginButton.setOnAction(e -> {
+            String username = usernameField.getText();
+            String password = passwordField.getText();
 
-        // Create the right panel to display an image
-        JPanel rightPanel = new JPanel();
-        rightPanel.setLayout(new BorderLayout());
-        rightPanel.setBackground(Color.WHITE);
+            if (validateCredentials(username, password)) {
+                messageLabel.setTextFill(Color.GREEN);
+                messageLabel.setText("Login successful!");
+            } else {
+                messageLabel.setTextFill(Color.RED);
+                messageLabel.setText("Invalid username or password.");
+            }
+        });
 
-        // Load and add the image from the specified path
-        JLabel imageLabel = new JLabel();
-        ImageIcon originalIcon = new ImageIcon("C://Users//Muhammad Khizer//IdeaProjects//SCD_TERM_PROJECT//images//pic3.png");
+        mainLayout.getChildren().add(loginGrid);
 
-        // Resize the image to fit the right panel's size
-        Image image = originalIcon.getImage();
-        Image scaledImage = image.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
-        ImageIcon scaledIcon = new ImageIcon(scaledImage);
+        // Center the HBox in a StackPane
+        StackPane root = new StackPane(mainLayout);
+        root.setAlignment(Pos.CENTER); // Center the entire layout in the page
 
-        imageLabel.setIcon(scaledIcon);
-        imageLabel.setHorizontalAlignment(JLabel.CENTER);
-        imageLabel.setVerticalAlignment(JLabel.CENTER);
-        rightPanel.add(imageLabel, BorderLayout.CENTER);
+        // Set up the scene and stage
+        Scene scene = new Scene(root, 1440, 740);
+        primaryStage.setTitle("Login Screen");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
 
-        // Create a thin black separator
-        JPanel separator = new JPanel();
-        separator.setBackground(Color.BLACK);
-        separator.setPreferredSize(new Dimension(1, 5)); // 1 pixel wide, full height of the frame
 
-        // Add left panel, separator, and right panel to the main panel
-        mainPanel.add(leftPanel);
-        mainPanel.add(separator);
-        mainPanel.add(rightPanel);
 
-        // Add the main panel to the frame
-        add(mainPanel, BorderLayout.CENTER);
-
-        // Set frame to be visible
-        setVisible(true);
+    // Mock validation method
+    private boolean validateCredentials(String username, String password) {
+        // Replace with actual validation logic (e.g., check a database)
+        return username.equals("superadmin") && password.equals("admin123") ||
+                username.equals("branchmanager") && password.equals("manager123");
     }
 
     public static void main(String[] args) {
-        // Run the frame creation on the Event Dispatch Thread (EDT)
-        SwingUtilities.invokeLater(() -> new cashierLoginFrame());
+        launch(args);
     }
 }
