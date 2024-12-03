@@ -20,10 +20,10 @@ public class LoginAdmin extends Application {
     public void start(Stage primaryStage) {
         HBox mainLayout = new HBox();
         mainLayout.setSpacing(10);
-        mainLayout.setStyle("-fx-background-color: #D8BFD8;");
+        mainLayout.setStyle("-fx-background-color: #ffffff;");
         mainLayout.setAlignment(Pos.CENTER);
 
-        Image image = new Image("file:C:/Users/talat/IdeaProjects/pos/app.png");
+        Image image = new Image("file:C:/Users/talat/IdeaProjects/pos/123.jpg");
         ImageView imageView = new ImageView(image);
         imageView.setPreserveRatio(true);
         imageView.setFitWidth(450);

@@ -20,7 +20,7 @@ public class LoginBranch extends Application {
     public void start(Stage primaryStage) {
         HBox mainLayout = new HBox();
         mainLayout.setSpacing(10);
-        mainLayout.setStyle("-fx-background-color: #D8BFD8;");
+        mainLayout.setStyle("-fx-background-color: #58b89c;");
         mainLayout.setAlignment(Pos.CENTER);
 
         Image image = new Image("file:C:/Users/talat/IdeaProjects/pos/app.png");
