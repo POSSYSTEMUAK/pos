@@ -18,29 +18,48 @@ public class LoginAdmin extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        HBox mainLayout = new HBox();
-        mainLayout.setSpacing(10);
-        mainLayout.setStyle("-fx-background-color: #ffffff;");
-        mainLayout.setAlignment(Pos.CENTER);
+        // Main layout using BorderPane
+        BorderPane mainLayout = new BorderPane();
+        mainLayout.setStyle("-fx-background-color: #FFFFFF;");
 
-        Image image = new Image("file:C:/Users/talat/IdeaProjects/pos/123.jpg");
+        // Back Button in the Top-Left
+        Button backButton = new Button("Back");
+        backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #d9534f; -fx-text-fill: white;");
+        backButton.setOnAction(e -> {
+            new LoginForm().start(new Stage()); // Navigate back to LoginFrame
+            primaryStage.close(); // Close the current stage
+        });
+
+        HBox topBar = new HBox(backButton);
+        topBar.setPadding(new Insets(10));
+        topBar.setAlignment(Pos.TOP_LEFT);
+        mainLayout.setTop(topBar);
+
+        // Center Section: Image and Login Form
+        VBox centerBox = new VBox();
+        centerBox.setAlignment(Pos.CENTER);
+        centerBox.setSpacing(20);
+
+        // Image
+        Image image = new Image("file:images/sa.jpg/");
         ImageView imageView = new ImageView(image);
         imageView.setPreserveRatio(true);
         imageView.setFitWidth(450);
-        VBox leftBox = new VBox(imageView);
-        leftBox.setAlignment(Pos.CENTER);
-        leftBox.setPadding(new Insets(0));
-        mainLayout.getChildren().add(leftBox);
+        imageView.setFitHeight(300);
+        centerBox.getChildren().add(imageView);
 
+        // Login Grid
         GridPane loginGrid = new GridPane();
         loginGrid.setAlignment(Pos.CENTER);
         loginGrid.setHgap(10);
         loginGrid.setVgap(10);
 
+        // Add Title
         Label titleLabel = new Label("Super Admin");
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         loginGrid.add(titleLabel, 0, 0, 2, 1);
 
+        // Add Username Field
         Label usernameLabel = new Label("Name:");
         usernameLabel.setStyle("-fx-font-size: 20px;");
         loginGrid.add(usernameLabel, 0, 1);
@@ -48,6 +67,7 @@ public class LoginAdmin extends Application {
         usernameField.setPromptText("Enter username");
         loginGrid.add(usernameField, 1, 1);
 
+        // Add Password Field
         Label passwordLabel = new Label("Password:");
         passwordLabel.setStyle("-fx-font-size: 20px;");
         loginGrid.add(passwordLabel, 0, 2);
@@ -55,13 +75,16 @@ public class LoginAdmin extends Application {
         passwordField.setPromptText("Enter password");
         loginGrid.add(passwordField, 1, 2);
 
+        // Add Login Button
         Button loginButton = new Button("Login");
         loginGrid.add(loginButton, 1, 3);
 
+        // Add Message Label for Feedback
         Label messageLabel = new Label();
         messageLabel.setTextFill(Color.RED);
         loginGrid.add(messageLabel, 0, 4, 2, 1);
 
+        // Set Login Button Action
         loginButton.setOnAction(e -> {
             String username = usernameField.getText();
             String password = passwordField.getText();
@@ -77,12 +100,11 @@ public class LoginAdmin extends Application {
             }
         });
 
-        mainLayout.getChildren().add(loginGrid);
+        centerBox.getChildren().add(loginGrid);
+        mainLayout.setCenter(centerBox);
 
-        StackPane root = new StackPane(mainLayout);
-        root.setAlignment(Pos.CENTER);
-
-        Scene scene = new Scene(root, 1440, 740);
+        // Set up the scene and stage
+        Scene scene = new Scene(mainLayout, 1440, 740);
         primaryStage.setTitle("Super Admin Login");
         primaryStage.setScene(scene);
         primaryStage.show();

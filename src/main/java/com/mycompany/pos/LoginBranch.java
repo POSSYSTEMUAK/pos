@@ -18,20 +18,36 @@ public class LoginBranch extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        HBox mainLayout = new HBox();
-        mainLayout.setSpacing(10);
+        // Main layout container
+        BorderPane mainLayout = new BorderPane();
         mainLayout.setStyle("-fx-background-color: #58b89c;");
-        mainLayout.setAlignment(Pos.CENTER);
 
-        Image image = new Image("file:C:/Users/talat/IdeaProjects/pos/app.png");
+        // Back Button in the Top-Left
+        Button backButton = new Button("Back");
+        backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #d9534f; -fx-text-fill: white;");
+        backButton.setOnAction(e -> {
+            new LoginForm().start(new Stage()); // Navigate back to LoginFrame
+            primaryStage.close(); // Close the current stage
+        });
+
+        HBox topBar = new HBox(backButton);
+        topBar.setPadding(new Insets(10));
+        topBar.setAlignment(Pos.TOP_LEFT);
+        mainLayout.setTop(topBar);
+
+        // Image and Login Form Centered Together
+        VBox centerBox = new VBox();
+        centerBox.setAlignment(Pos.CENTER);
+        centerBox.setSpacing(20);
+
+        // Image
+        Image image = new Image("file:images/bm.png/");
         ImageView imageView = new ImageView(image);
         imageView.setPreserveRatio(true);
         imageView.setFitWidth(450);
-        VBox leftBox = new VBox(imageView);
-        leftBox.setAlignment(Pos.CENTER);
-        leftBox.setPadding(new Insets(0));
-        mainLayout.getChildren().add(leftBox);
+        centerBox.getChildren().add(imageView);
 
+        // Login Grid
         GridPane loginGrid = new GridPane();
         loginGrid.setAlignment(Pos.CENTER);
         loginGrid.setHgap(10);
@@ -77,12 +93,11 @@ public class LoginBranch extends Application {
             }
         });
 
-        mainLayout.getChildren().add(loginGrid);
+        centerBox.getChildren().add(loginGrid);
+        mainLayout.setCenter(centerBox);
 
-        StackPane root = new StackPane(mainLayout);
-        root.setAlignment(Pos.CENTER);
-
-        Scene scene = new Scene(root, 1440, 740);
+        // Scene Setup
+        Scene scene = new Scene(mainLayout, 1440, 740);
         primaryStage.setTitle("Branch Manager Login");
         primaryStage.setScene(scene);
         primaryStage.show();
