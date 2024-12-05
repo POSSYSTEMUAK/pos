@@ -11,27 +11,47 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class dataEntryOperatorLoginFrame extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Main layout with HBox for image and login form
-        HBox mainLayout = new HBox();
-        mainLayout.setSpacing(10); // Minimum spacing between left and right sections
+        // Main layout using BorderPane
+        BorderPane mainLayout = new BorderPane();
         mainLayout.setStyle("-fx-background-color: #ADD8E6;");
-        mainLayout.setAlignment(Pos.CENTER); // Center horizontally within HBox
 
-        // Left Section: Add an image
-        Image image = new Image("file:D:/IdeaProjects/pos/images/pic2.png/");
+        // Back Button in the Top-Left
+        Button backButton = new Button("Back");
+        backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #d9534f; -fx-text-fill: white;");
+        backButton.setOnAction(e -> {
+            try {
+                new LoginForm().start(new Stage()); // Navigate back to LoginFrame
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            primaryStage.close(); // Close the current stage
+        });
+
+        HBox topBar = new HBox(backButton);
+        topBar.setPadding(new Insets(10));
+        topBar.setAlignment(Pos.TOP_LEFT);
+        mainLayout.setTop(topBar);
+
+        // Center Section: Image and Login Form
+        VBox centerBox = new VBox();
+        centerBox.setAlignment(Pos.CENTER);
+        centerBox.setSpacing(20);
+
+        // Image
+        Image image = new Image("file:images/de.png/");
         ImageView imageView = new ImageView(image);
         imageView.setPreserveRatio(true);
-        imageView.setFitWidth(450); // Set a preferred width for the image
-        VBox leftBox = new VBox(imageView);
-        leftBox.setAlignment(Pos.CENTER);
-        leftBox.setPadding(new Insets(0));
-        mainLayout.getChildren().add(leftBox);
+        imageView.setFitWidth(450);
+        imageView.setFitHeight(300);
+        centerBox.getChildren().add(imageView);
 
-        // Right Section: Create a grid layout for the login form
+        // Login Grid
         GridPane loginGrid = new GridPane();
         loginGrid.setAlignment(Pos.CENTER);
         loginGrid.setHgap(10);
@@ -83,20 +103,15 @@ public class dataEntryOperatorLoginFrame extends Application {
             }
         });
 
-        mainLayout.getChildren().add(loginGrid);
-
-        // Center the HBox in a StackPane
-        StackPane root = new StackPane(mainLayout);
-        root.setAlignment(Pos.CENTER); // Center the entire layout in the page
+        centerBox.getChildren().add(loginGrid);
+        mainLayout.setCenter(centerBox);
 
         // Set up the scene and stage
-        Scene scene = new Scene(root, 1440, 740);
+        Scene scene = new Scene(mainLayout, 1440, 740);
         primaryStage.setTitle("Login Screen");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
-
 
     // Mock validation method
     private boolean validateCredentials(String username, String password) {

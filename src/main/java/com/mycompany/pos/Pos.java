@@ -1,29 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- */
-
 package com.mycompany.pos;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
+import javafx.application.Application;
 
-/**
- *
- * @author talat
- */
 public class Pos {
 
-    public static void main(String[] args)  throws IOException
-    {
-
-        //new ResizableWindow();
-        //new BranchManager();
-
-         new Splashscreen(5000);
-        //new BranchManager();
-
+    public static void main(String[] args) {
+        // Launch the JavaFX Splashscreen application
+        Application.launch(Splashscreen.class, args);
     }
 }

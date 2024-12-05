@@ -1,215 +1,83 @@
-/*package com.mycompany.pos;
-
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-public class Splashscreen extends JWindow
-{
-
-    public Splashscreen(int duration)
-    {
-        showSplash(duration);
-    }
-
-    private void showSplash(int duration) {
-
-        JPanel content = (JPanel) getContentPane();
-        content.setBackground(Color.white);
-
-        //SPLASH SCREEN SIZE N POSITION:
-        int width = 500;
-        int height = 250;
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        int x = (screen.width - width) / 2;
-        int y = (screen.height - height) / 2;
-        setBounds(x, y, width, height);
-
-
-        JLabel label = new JLabel(new ImageIcon("metro icon.png")); // Replace with your image path
-        JLabel text = new JLabel("WELCOME TO METRO CASH AND CARRY", JLabel.CENTER);
-        text.setFont(new Font("Sans-Serif", Font.BOLD, 20));
-        text.setForeground(Color.blue);
-
-
-        JProgressBar progressBar = new JProgressBar();
-        progressBar.setMinimum(0);
-        progressBar.setMaximum(100);
-        progressBar.setValue(0);
-        progressBar.setStringPainted(true);
-        progressBar.setBorder(BorderFactory.createLineBorder(Color.blue));
-        progressBar.setForeground(Color.blue);
-
-
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-        text.setAlignmentX(Component.CENTER_ALIGNMENT);
-        label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        progressBar.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        content.add(Box.createVerticalStrut(10));
-        content.add(text);
-        content.add(Box.createVerticalStrut(10));
-        content.add(label);
-        content.add(Box.createVerticalStrut(10));
-        content.add(progressBar);
-
-        // SETTING UP THE BORDER AROUND SPLASH SCREEN:
-        content.setBorder(BorderFactory.createLineBorder(Color.white, 5));
-
-
-        setVisible(true);
-
-
-        int updateInterval = duration / 100;
-        for (int i = 0; i <= 100; i++) {
-            progressBar.setValue(i);
-            try {
-                Thread.sleep(updateInterval);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        new Thread(() -> {
-            try {
-                TimeUnit.SECONDS.sleep(1);           // SPLAS SCREEN RUN FOR 5 SECONDS:
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            // LOGIN PAGE APPEARS AFTER SPLASH SCREEN IS EXITTED:
-            SwingUtilities.invokeLater(() -> {
-                try {
-                    new LoginForm().setVisible(true);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            dispose();
-        }).start();
-
-    }
-
-
-}
-*/
-
-
 package com.mycompany.pos;
-import com.mycompany.pos.LoginForm;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import javafx.application.Application;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
-public class Splashscreen extends JWindow
-{
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-    public Splashscreen(int duration)
-    {
-        showSplash(duration);
-    }
+public class Splashscreen extends Application {
 
-    private void showSplash(int duration)
-    {
+    private static final int SPLASH_DURATION = 5000; // Duration in milliseconds
 
-        JPanel content = (JPanel) getContentPane();
-        content.setBackground(Color.white);
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.initStyle(StageStyle.UNDECORATED); // No window decorations
 
-        //SPLASH SCREEN SIZE N POSITION:
-        int width = 500;
-        int height = 250;
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        int x = (screen.width - width) / 2;
-        int y = (screen.height - height) / 2;
-        setBounds(x, y, width, height);
+        // Layout for splash screen
+        VBox layout = new VBox(10);
+        layout.setAlignment(Pos.CENTER);
+        layout.setStyle("-fx-background-color: white;");
 
+        // Image for splash screen
+        ImageView logo = new ImageView(new Image("file:metro icon.png"));
+        logo.setFitWidth(200);
+        logo.setPreserveRatio(true);
 
-        JLabel label = new JLabel(new ImageIcon("metro icon.png"));
-        JLabel text = new JLabel("WELCOME TO METRO CASH AND CARRY", JLabel.CENTER);
-        text.setFont(new Font("Sans-Serif", Font.BOLD, 20));
-        text.setForeground(Color.blue);
+        // Welcome text
+        Label welcomeText = new Label("WELCOME TO METRO CASH AND CARRY");
+        welcomeText.setFont(new Font("Sans-Serif", 20));
+        welcomeText.setTextFill(Color.BLACK);
 
+        // Progress bar
+        ProgressBar progressBar = new ProgressBar(0);
+        progressBar.setPrefWidth(300);
 
-        JProgressBar progressBar = new JProgressBar();
-        progressBar.setMinimum(0);
-        progressBar.setMaximum(100);
-        progressBar.setValue(0);
-        progressBar.setStringPainted(true);
-        progressBar.setBorder(BorderFactory.createLineBorder(Color.BLUE));
-        progressBar.setForeground(Color.blue);
+        // Add components to layout
+        layout.getChildren().addAll(welcomeText, logo, progressBar);
 
+        // Scene and stage setup
+        Scene scene = new Scene(layout, 500, 250);
+        primaryStage.setScene(scene);
+        primaryStage.show();
 
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-        text.setAlignmentX(Component.CENTER_ALIGNMENT);
-        label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        progressBar.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        content.add(Box.createVerticalStrut(10));
-        content.add(text);
-        content.add(Box.createVerticalStrut(10));
-        content.add(label);
-        content.add(Box.createVerticalStrut(10));
-        content.add(progressBar);
-
-        // SETTING UP THE BORDER AROUND SPLASH SCREEN:
-        content.setBorder(BorderFactory.createLineBorder(Color.WHITE, 5));
-
-
-        setVisible(true);
-
-
-        int updateInterval = duration / 100;
-        for (int i = 0; i <= 100; i++)
-        {
-            progressBar.setValue(i);
-            try
-            {
-                Thread.sleep(updateInterval);
-            }
-            catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-        }
-
-
-        new Thread(() -> {
-            try
-            {
-                TimeUnit.SECONDS.sleep(1);           // SPLAS SCREEN RUN FOR 5 SECONDS:
-            }
-            catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-            // LOGIN PAGE APPEARS AFTER SPLASH SCREEN IS EXITTED:
-            SwingUtilities.invokeLater(() -> {
-                try
-                {
-                    new LoginForm().setVisible(true);
+        // Update progress bar and switch to LoginForm after SPLASH_DURATION
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> {
+            for (int i = 1; i <= 100; i++) {
+                int progress = i;
+                try {
+                    Thread.sleep(SPLASH_DURATION / 100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-                catch (IOException e)
-                {
-                    throw new RuntimeException(e);
+                javafx.application.Platform.runLater(() -> progressBar.setProgress(progress / 100.0));
+            }
+
+            // After splash screen, show the LoginForm
+            javafx.application.Platform.runLater(() -> {
+                primaryStage.close(); // Close splash screen
+                try {
+                    new LoginForm().start(new Stage()); // Launch LoginForm
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
-            dispose();
-        }).start();
-
-
-
-
-
-
-
-
-        setVisible(false);
-        dispose();
+        });
+        executor.shutdown();
     }
 
-
-
+    public static void main(String[] args) {
+        launch(args);
+    }
 }
