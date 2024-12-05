@@ -25,11 +25,7 @@ public class dataEntryOperatorLoginFrame extends Application {
         Button backButton = new Button("Back");
         backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #d9534f; -fx-text-fill: white;");
         backButton.setOnAction(e -> {
-            try {
-                new LoginForm().start(new Stage()); // Navigate back to LoginFrame
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+            new LoginForm().start(new Stage()); // Navigate back to LoginFrame
             primaryStage.close(); // Close the current stage
         });
 
