@@ -104,8 +104,13 @@ public class LoginBranch extends Application {
     }
 
     private boolean validateBranchManager(String username, String password) {
-        MongoCollection<Document> collection = dbConnection.getEmployeeCollection();
-        Document query = new Document("username", username).append("password", password);
+        MongoCollection<Document> collection = dbConnection.getManagerCollection();
+
+        // Query to find a manager with matching name and password
+        Document query = new Document("managerName", username)
+                .append("managerPassword", password);
+
+        // Check if a matching document exists
         Document result = collection.find(query).first();
         return result != null; // Returns true if a matching document is found
     }

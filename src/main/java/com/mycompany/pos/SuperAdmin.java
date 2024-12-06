@@ -2,16 +2,15 @@ package com.mycompany.pos;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import org.bson.Document;
 import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import org.bson.Document;
 
 public class SuperAdmin extends Application {
 
@@ -19,123 +18,199 @@ public class SuperAdmin extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Connect to MongoDB using the DatabaseConnection class
         database = DatabaseConnection.getDatabase();
 
         primaryStage.setTitle("Super Admin Dashboard");
+
+        Button backButton = new Button("Back");
+        backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #d9534f; -fx-text-fill: white;");
+        backButton.setOnAction(e -> {
+            new LoginAdmin().start(new Stage());
+            primaryStage.close();
+        });
+
+        HBox topBar = new HBox(backButton);
+        topBar.setAlignment(Pos.TOP_LEFT);
 
         // Header Section
         Label header = new Label("Super Admin Dashboard");
         header.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #000000;");
 
+        HBox headerContainer = new HBox(header);
+        headerContainer.setAlignment(Pos.CENTER);
+
+        VBox topSection = new VBox(topBar, headerContainer);
+        topSection.setAlignment(Pos.CENTER);
+        topSection.setSpacing(10);
+
         // Branch Management Section
         Label branchLabel = new Label("Branch Management");
-        branchLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #000000;");
+        branchLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        TextField branchID = new TextField();
-        branchID.setPromptText("Branch ID");
-        branchID.setMaxWidth(250);
+        ComboBox<String> branchCityDropdown = new ComboBox<>();
+        branchCityDropdown.getItems().addAll("Karachi", "Lahore", "Islamabad", "Peshawar", "Quetta");
+        branchCityDropdown.setPromptText("Select City");
+        branchCityDropdown.setMaxWidth(250);
 
         TextField branchName = new TextField();
         branchName.setPromptText("Branch Name");
         branchName.setMaxWidth(250);
 
-        TextField branchCity = new TextField();
-        branchCity.setPromptText("City");
-        branchCity.setMaxWidth(250);
-
         Button addBranchButton = new Button("Add Branch");
-        Button editBranchButton = new Button("Edit Branch");
+        Button showBranchesButton = new Button("Show Branches");
 
-        // Add Branch functionality
-        addBranchButton.setOnAction(e -> {
-            String id = branchID.getText().trim();
-            String name = branchName.getText().trim();
-            String city = branchCity.getText().trim();
+        // Branch Table
+        TableView<Document> branchTable = new TableView<>();
+        branchTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-            if (!id.isEmpty() && !name.isEmpty() && !city.isEmpty()) {
-                MongoCollection<Document> branches = database.getCollection("Branches");
-                Document branch = new Document("branchID", id)
-                        .append("branchName", name)
-                        .append("branchCity", city);
-                branches.insertOne(branch);
+        TableColumn<Document, String> branchNameColumn = new TableColumn<>("Branch Name");
+        branchNameColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("branchName")));
 
-                System.out.println("Branch added: " + branch.toJson());
-                clearTextFields(branchID, branchName, branchCity);
-            } else {
-                System.out.println("All fields are required.");
+        TableColumn<Document, String> branchCityColumn = new TableColumn<>("Branch City");
+        branchCityColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("branchCity")));
+
+        TableColumn<Document, Void> editBranchColumn = new TableColumn<>("Edit");
+        editBranchColumn.setCellFactory(param -> new TableCell<>() {
+            private final Button editButton = new Button("Edit");
+
+            {
+                editButton.setOnAction(e -> {
+                    Document branch = getTableView().getItems().get(getIndex());
+                    branchName.setText(branch.getString("branchName"));
+                    branchCityDropdown.setValue(branch.getString("branchCity"));
+                    System.out.println("Editing Branch: " + branch.toJson());
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : editButton);
             }
         });
 
-        // Edit Branch functionality (basic example, assumes matching by ID)
-        editBranchButton.setOnAction(e -> {
-            String id = branchID.getText().trim();
-            String name = branchName.getText().trim();
-            String city = branchCity.getText().trim();
+        branchTable.getColumns().addAll(branchNameColumn, branchCityColumn, editBranchColumn);
 
-            if (!id.isEmpty() && (!name.isEmpty() || !city.isEmpty())) {
-                MongoCollection<Document> branches = database.getCollection("Branches");
-                Document query = new Document("branchID", id);
-                Document updateFields = new Document();
-                if (!name.isEmpty()) updateFields.append("branchName", name);
-                if (!city.isEmpty()) updateFields.append("branchCity", city);
-
-                branches.updateOne(query, new Document("$set", updateFields));
-                System.out.println("Branch updated: " + updateFields.toJson());
-                clearTextFields(branchID, branchName, branchCity);
-            } else {
-                System.out.println("Branch ID and at least one other field are required.");
-            }
+        showBranchesButton.setOnAction(e -> {
+            branchTable.getItems().clear();
+            MongoCollection<Document> branches = database.getCollection("branches");
+            branches.find().forEach(branchTable.getItems()::add);
         });
 
-        VBox branchSection = new VBox(10, branchLabel, branchID, branchName, branchCity, addBranchButton, editBranchButton);
+        VBox branchSection = new VBox(10, branchLabel, branchCityDropdown, branchName, addBranchButton, showBranchesButton, branchTable);
         branchSection.setAlignment(Pos.CENTER);
-        branchSection.setVisible(false); // Initially hidden
+        branchSection.setVisible(false);
 
-        // Branch Manager Section
-        Label managerLabel = new Label("Branch Manager Management");
-        managerLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #000000;");
+        // Branch Manager Management Section
+        Label branchManagerLabel = new Label("Branch Manager Management");
+        branchManagerLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         TextField managerName = new TextField();
         managerName.setPromptText("Manager Name");
         managerName.setMaxWidth(250);
 
-        TextField managerBranchID = new TextField();
-        managerBranchID.setPromptText("Branch ID");
-        managerBranchID.setMaxWidth(250);
+        TextField managerEmail = new TextField();
+        managerEmail.setPromptText("Manager Email");
+        managerEmail.setMaxWidth(250);
 
-        Button assignManagerButton = new Button("Assign Manager");
+        PasswordField managerPassword = new PasswordField();
+        managerPassword.setPromptText("Manager Password");
+        managerPassword.setMaxWidth(250);
 
-        // Assign Manager functionality
-        assignManagerButton.setOnAction(e -> {
-            String name = managerName.getText().trim();
-            String branchId = managerBranchID.getText().trim();
+        Button addManagerButton = new Button("Add Manager");
+        Button showManagersButton = new Button("Show Managers");
 
-            if (!name.isEmpty() && !branchId.isEmpty()) {
-                MongoCollection<Document> managers = database.getCollection("BranchManagers");
-                Document manager = new Document("managerName", name)
-                        .append("branchID", branchId);
-                managers.insertOne(manager);
+        // Manager Table
+        TableView<Document> managerTable = new TableView<>();
+        managerTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-                System.out.println("Manager assigned: " + manager.toJson());
-                clearTextFields(managerName, managerBranchID);
+        TableColumn<Document, String> managerNameColumn = new TableColumn<>("Manager Name");
+        managerNameColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("managerName")));
+
+        TableColumn<Document, String> managerEmailColumn = new TableColumn<>("Manager Email");
+        managerEmailColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("managerEmail")));
+
+        TableColumn<Document, Void> editManagerColumn = new TableColumn<>("Edit");
+        editManagerColumn.setCellFactory(param -> new TableCell<>() {
+            private final Button editButton = new Button("Edit");
+
+            {
+                editButton.setOnAction(e -> {
+                    Document manager = getTableView().getItems().get(getIndex());
+                    managerName.setText(manager.getString("managerName"));
+                    managerEmail.setText(manager.getString("managerEmail"));
+                    managerPassword.setText(manager.getString("managerPassword"));
+                    System.out.println("Editing Manager: " + manager.toJson());
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : editButton);
+            }
+        });
+
+        managerTable.getColumns().addAll(managerNameColumn, managerEmailColumn, editManagerColumn);
+
+        showManagersButton.setOnAction(e -> {
+            managerTable.getItems().clear();
+            MongoCollection<Document> managers = database.getCollection("managers");
+            managers.find().forEach(managerTable.getItems()::add);
+        });
+
+        VBox managerSection = new VBox(10, branchManagerLabel, managerName, managerEmail, managerPassword, addManagerButton, showManagersButton, managerTable);
+        managerSection.setAlignment(Pos.CENTER);
+        managerSection.setVisible(false);
+
+        // Adding branches
+        addBranchButton.setOnAction(e -> {
+            String name = branchName.getText().trim();
+            String city = branchCityDropdown.getValue();
+
+            if (city != null && !name.isEmpty()) {
+                MongoCollection<Document> branches = database.getCollection("Branches");
+                Document branch = new Document("branchName", name)
+                        .append("branchCity", city);
+                branches.insertOne(branch);
+
+                System.out.println("Branch added: " + branch.toJson());
+                branchName.clear();
+                branchCityDropdown.setValue(null);
             } else {
                 System.out.println("All fields are required.");
             }
         });
 
-        VBox managerSection = new VBox(10, managerLabel, managerName, managerBranchID, assignManagerButton);
-        managerSection.setAlignment(Pos.CENTER);
-        managerSection.setVisible(false); // Initially hidden
+        // Adding managers
+        addManagerButton.setOnAction(e -> {
+            String name = managerName.getText().trim();
+            String email = managerEmail.getText().trim();
+            String password = managerPassword.getText().trim();
 
-        // StackPane to overlay the sections
+            if (!name.isEmpty() && !email.isEmpty() && !password.isEmpty()) {
+                MongoCollection<Document> managers = database.getCollection("managers");
+                Document manager = new Document("managerName", name)
+                        .append("managerEmail", email)
+                        .append("managerPassword", password);
+                managers.insertOne(manager);
+
+                System.out.println("Manager added: " + manager.toJson());
+                managerName.clear();
+                managerEmail.clear();
+                managerPassword.clear();
+            } else {
+                System.out.println("All fields are required.");
+            }
+        });
+
+        // Overlay sections
         StackPane contentPane = new StackPane(branchSection, managerSection);
         contentPane.setAlignment(Pos.CENTER);
         contentPane.setPadding(new Insets(20));
 
-        // Buttons for toggling sections
-        Button branchManagementButton = new Button("Branch");
-        Button branchManagerButton = new Button("Manager");
+        Button branchManagementButton = new Button("Branch Management");
+        Button branchManagerButton = new Button("Branch Manager Management");
 
         branchManagementButton.setOnAction(e -> {
             branchSection.setVisible(true);
@@ -143,29 +218,21 @@ public class SuperAdmin extends Application {
         });
 
         branchManagerButton.setOnAction(e -> {
-            branchSection.setVisible(false);
             managerSection.setVisible(true);
+            branchSection.setVisible(false);
         });
 
         HBox toggleButtons = new HBox(20, branchManagementButton, branchManagerButton);
         toggleButtons.setAlignment(Pos.CENTER);
 
-        // Main Layout
-        VBox layout = new VBox(20, header, toggleButtons, contentPane);
+        VBox layout = new VBox(20, topSection, toggleButtons, contentPane);
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.TOP_CENTER);
         layout.setStyle("-fx-background-color: #FFFFFF;");
 
-        // Set up the scene and stage
-        Scene scene = new Scene(layout, 800, 600);
+        Scene scene = new Scene(layout, 1440, 740);
         primaryStage.setScene(scene);
         primaryStage.show();
-    }
-
-    private void clearTextFields(TextField... fields) {
-        for (TextField field : fields) {
-            field.clear();
-        }
     }
 
     public static void main(String[] args) {

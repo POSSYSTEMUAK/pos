@@ -22,4 +22,7 @@ public class DatabaseConnection {
     public MongoCollection<Document> getAdminCollection() {
         return getDatabase().getCollection("admin");
     }
+    public MongoCollection<Document> getManagerCollection() {
+        return getDatabase().getCollection("managers");
+    }
 }

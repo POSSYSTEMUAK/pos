@@ -1,14 +1,13 @@
 package com.mycompany.pos;
 
 import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
+import javafx.stage.*;
 import org.bson.Document;
 import com.mongodb.client.MongoCollection;
 
@@ -17,7 +16,6 @@ public class BranchManager extends Application {
     private final MongoCollection<Document> employeeCollection;
 
     public BranchManager() {
-        // Use the existing DatabaseConnection to get the MongoDB collection
         DatabaseConnection dbConnection = new DatabaseConnection();
         this.employeeCollection = dbConnection.getEmployeeCollection(); // Assuming getEmployeeCollection() returns the collection
     }
@@ -38,16 +36,58 @@ public class BranchManager extends Application {
         cashierName.setPromptText("Cashier Name");
         cashierName.setMaxWidth(250);
 
-        TextField cashierRole = new TextField();
-        cashierRole.setPromptText("Role (Cashier)");
-        cashierRole.setMaxWidth(250);
+        PasswordField cashierPassword = new PasswordField();
+        cashierPassword.setPromptText("Cashier Password");
+        cashierPassword.setMaxWidth(250);
 
         Button addCashierButton = new Button("Add Cashier");
-        Button resetCashierPasswordButton = new Button("Reset Password");
+        Button showCashiersButton = new Button("Show Cashiers");
 
-        VBox cashierSection = new VBox(10, cashierLabel, cashierName, cashierRole, addCashierButton, resetCashierPasswordButton);
+        // Cashier Table
+        TableView<Document> cashierTable = new TableView<>();
+        cashierTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        TableColumn<Document, String> cashierNameColumn = new TableColumn<>("Name");
+        cashierNameColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("name")));
+        cashierNameColumn.setEditable(true); // Make the name editable
+
+        TableColumn<Document, String> cashierRoleColumn = new TableColumn<>("Role");
+        cashierRoleColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("role")));
+        cashierRoleColumn.setEditable(false); // Make the role uneditable
+
+        TableColumn<Document, String> cashierPasswordColumn = new TableColumn<>("Password");
+        cashierPasswordColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("password")));
+        cashierPasswordColumn.setEditable(true); // Make the password editable
+
+        TableColumn<Document, Void> editCashierColumn = new TableColumn<>("Edit");
+        editCashierColumn.setCellFactory(param -> new TableCell<>() {
+            private final Button editButton = new Button("Edit");
+
+            {
+                editButton.setOnAction(e -> {
+                    Document cashier = getTableView().getItems().get(getIndex());
+                    // Create the Edit dialog
+                    showEditDialog(cashier, cashierTable);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : editButton);
+            }
+        });
+
+        cashierTable.getColumns().addAll(cashierNameColumn, cashierRoleColumn, cashierPasswordColumn, editCashierColumn);
+
+        showCashiersButton.setOnAction(e -> {
+            cashierTable.getItems().clear();
+            employeeCollection.find(new Document("role", "Cashier")).forEach(cashierTable.getItems()::add);
+        });
+
+        VBox cashierSection = new VBox(10, cashierLabel, cashierName, cashierPassword, addCashierButton, showCashiersButton, cashierTable);
         cashierSection.setAlignment(Pos.CENTER);
-        cashierSection.setVisible(false); // Initially hidden
+        cashierSection.setVisible(false);
 
         // Data Entry Operator Management Section
         Label operatorLabel = new Label("Data Entry Operator Management");
@@ -57,16 +97,58 @@ public class BranchManager extends Application {
         operatorName.setPromptText("Operator Name");
         operatorName.setMaxWidth(250);
 
-        TextField operatorRole = new TextField();
-        operatorRole.setPromptText("Role (Data Entry Operator)");
-        operatorRole.setMaxWidth(250);
+        PasswordField operatorPassword = new PasswordField();
+        operatorPassword.setPromptText("Operator Password");
+        operatorPassword.setMaxWidth(250);
 
         Button addOperatorButton = new Button("Add Operator");
-        Button resetOperatorPasswordButton = new Button("Reset Password");
+        Button showOperatorsButton = new Button("Show Operators");
 
-        VBox operatorSection = new VBox(10, operatorLabel, operatorName, operatorRole, addOperatorButton, resetOperatorPasswordButton);
+        // Operator Table
+        TableView<Document> operatorTable = new TableView<>();
+        operatorTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        TableColumn<Document, String> operatorNameColumn = new TableColumn<>("Name");
+        operatorNameColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("name")));
+        operatorNameColumn.setEditable(true); // Make the name editable
+
+        TableColumn<Document, String> operatorRoleColumn = new TableColumn<>("Role");
+        operatorRoleColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("role")));
+        operatorRoleColumn.setEditable(false); // Make the role uneditable
+
+        TableColumn<Document, String> operatorPasswordColumn = new TableColumn<>("Password");
+        operatorPasswordColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("password")));
+        operatorPasswordColumn.setEditable(true); // Make the password editable
+
+        TableColumn<Document, Void> editOperatorColumn = new TableColumn<>("Edit");
+        editOperatorColumn.setCellFactory(param -> new TableCell<>() {
+            private final Button editButton = new Button("Edit");
+
+            {
+                editButton.setOnAction(e -> {
+                    Document operator = getTableView().getItems().get(getIndex());
+                    // Create the Edit dialog
+                    showEditDialog(operator, operatorTable);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : editButton);
+            }
+        });
+
+        operatorTable.getColumns().addAll(operatorNameColumn, operatorRoleColumn, operatorPasswordColumn, editOperatorColumn);
+
+        showOperatorsButton.setOnAction(e -> {
+            operatorTable.getItems().clear();
+            employeeCollection.find(new Document("role", "Data Entry Operator")).forEach(operatorTable.getItems()::add);
+        });
+
+        VBox operatorSection = new VBox(10, operatorLabel, operatorName, operatorPassword, addOperatorButton, showOperatorsButton, operatorTable);
         operatorSection.setAlignment(Pos.CENTER);
-        operatorSection.setVisible(false); // Initially hidden
+        operatorSection.setVisible(false);
 
         // StackPane to overlay the sections
         StackPane contentPane = new StackPane(cashierSection, operatorSection);
@@ -93,43 +175,95 @@ public class BranchManager extends Application {
         // Main Layout
         VBox layout = new VBox(20, header, toggleButtons, contentPane);
         layout.setPadding(new Insets(20));
-        layout.setAlignment(Pos.TOP_CENTER); // Center everything at the top
-        layout.setStyle("-fx-background-color: #FFFFFF;"); // White background color
+        layout.setAlignment(Pos.TOP_CENTER);
+        layout.setStyle("-fx-background-color: #FFFFFF;");
 
         // Set up the scene and stage
-        Scene scene = new Scene(layout, 800, 600);
+        Scene scene = new Scene(layout, 1000, 700);
         primaryStage.setScene(scene);
         primaryStage.show();
 
         // Add Cashier functionality
         addCashierButton.setOnAction(e -> {
             String name = cashierName.getText();
-            String role = cashierRole.getText();
-            String password = "defaultPassword123"; // Default password for new cashier
+            String password = cashierPassword.getText();
+            String role = "Cashier";  // Automatically set role as Cashier
 
-            if (!name.isEmpty() && role.equalsIgnoreCase("Cashier")) {
+            if (!name.isEmpty() && !password.isEmpty()) {
                 Document employee = new Document("name", name)
                         .append("role", role)
                         .append("password", password)
                         .append("branchId", "branch_id"); // Replace with actual branch ID
-                employeeCollection.insertOne(employee); // Insert into MongoDB
+                employeeCollection.insertOne(employee);
                 System.out.println("Cashier added: " + name + " with role " + role);
+                cashierName.clear();
+                cashierPassword.clear();
             } else {
-                System.out.println("All fields are required, and role must be 'Cashier'.");
+                System.out.println("Name and password are required.");
             }
         });
 
-        // Reset Cashier Password functionality
-        resetCashierPasswordButton.setOnAction(e -> {
-            String employeeId = "employee_id"; // Replace with actual employee ID
-            String newPassword = "newSecurePassword";
+        // Add Operator functionality
+        addOperatorButton.setOnAction(e -> {
+            String name = operatorName.getText();
+            String password = operatorPassword.getText();
+            String role = "Data Entry Operator";  // Automatically set role as Data Entry Operator
 
-            Document query = new Document("_id", employeeId); // Query to find employee by ID
-            Document update = new Document("$set", new Document("password", newPassword));
-
-            employeeCollection.updateOne(query, update); // Update password in MongoDB
-            System.out.println("Password reset for employee ID: " + employeeId);
+            if (!name.isEmpty() && !password.isEmpty()) {
+                Document employee = new Document("name", name)
+                        .append("role", role)
+                        .append("password", password)
+                        .append("branchId", "branch_id"); // Replace with actual branch ID
+                employeeCollection.insertOne(employee);
+                System.out.println("Operator added: " + name + " with role " + role);
+                operatorName.clear();
+                operatorPassword.clear();
+            } else {
+                System.out.println("Name and password are required.");
+            }
         });
+    }
+
+    private void showEditDialog(Document employee, TableView<Document> table) {
+        Stage editStage = new Stage();
+        editStage.initModality(Modality.APPLICATION_MODAL);
+        editStage.setTitle("Edit Employee");
+
+        TextField editName = new TextField(employee.getString("name"));
+        editName.setPromptText("Name");
+
+        PasswordField editPassword = new PasswordField();
+        editPassword.setPromptText("Password");
+        editPassword.setText(employee.getString("password"));
+
+        Button saveButton = new Button("Save");
+
+        saveButton.setOnAction(e -> {
+            String newName = editName.getText();
+            String newPassword = editPassword.getText();
+
+            if (!newName.isEmpty() && !newPassword.isEmpty()) {
+                employee.put("name", newName);
+                employee.put("password", newPassword);
+                employeeCollection.updateOne(
+                        new Document("_id", employee.get("_id")),
+                        new Document("$set", employee)
+                );
+                table.refresh();
+                editStage.close();
+                System.out.println("Employee updated: " + newName);
+            } else {
+                System.out.println("Name and password are required.");
+            }
+        });
+
+        VBox dialogLayout = new VBox(10, editName, editPassword, saveButton);
+        dialogLayout.setAlignment(Pos.CENTER);
+        dialogLayout.setPadding(new Insets(20));
+
+        Scene dialogScene = new Scene(dialogLayout, 1440, 740);
+        editStage.setScene(dialogScene);
+        editStage.show();
     }
 
     public static void main(String[] args) {
