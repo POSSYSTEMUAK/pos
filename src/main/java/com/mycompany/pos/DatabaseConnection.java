@@ -25,4 +25,12 @@ public class DatabaseConnection {
     public MongoCollection<Document> getManagerCollection() {
         return getDatabase().getCollection("managers");
     }
+
+    public MongoCollection<Document> getProductCollection() {
+        return getDatabase().getCollection("products");
+    }
+
+    public MongoCollection<Document> getVendorCollection() {
+        return getDatabase().getCollection("vendors");
+    }
 }

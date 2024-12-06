@@ -176,10 +176,10 @@ public class BranchManager extends Application {
         VBox layout = new VBox(20, header, toggleButtons, contentPane);
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.TOP_CENTER);
-        layout.setStyle("-fx-background-color: #FFFFFF;");
+        layout.setStyle("-fx-background-color: #58b89c;");
 
         // Set up the scene and stage
-        Scene scene = new Scene(layout, 1000, 700);
+        Scene scene = new Scene(layout, 1440, 740);
         primaryStage.setScene(scene);
         primaryStage.show();
 

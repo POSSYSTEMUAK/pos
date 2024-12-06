@@ -93,7 +93,7 @@ public class SuperAdmin extends Application {
 
         showBranchesButton.setOnAction(e -> {
             branchTable.getItems().clear();
-            MongoCollection<Document> branches = database.getCollection("branches");
+            MongoCollection<Document> branches = database.getCollection("Branches");
             branches.find().forEach(branchTable.getItems()::add);
         });
 
