@@ -110,6 +110,7 @@ public class DataEntry extends Application {
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 setGraphic(empty ? null : editButton);
+                setAlignment(Pos.CENTER);
             }
         });
 
