@@ -30,7 +30,7 @@ public class BranchManager extends Application {
 
         // Back Button
         Button backButton = new Button("Back");
-        backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #000000; -fx-text-fill: #58b89c;");
+        backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #000000; -fx-text-fill: #78f686;");
         backButton.setOnAction(e -> {
             new LoginBranch().start(new Stage()); // Go back to LoginBranch
             primaryStage.close();
@@ -39,7 +39,7 @@ public class BranchManager extends Application {
         HBox topBar = new HBox(backButton);
         topBar.setPadding(new Insets(10));
         topBar.setAlignment(Pos.TOP_LEFT);
-        topBar.setStyle("-fx-background-color: #58b89c;");
+        topBar.setStyle("-fx-background-color: #78f686;");
 
         // Cashier Management Section
         Label cashierLabel = new Label("Cashier Management");
@@ -118,7 +118,7 @@ public class BranchManager extends Application {
         VBox mainContent = new VBox(20, header, toggleButtons, contentPane);
         mainContent.setPadding(new Insets(20));
         mainContent.setAlignment(Pos.TOP_CENTER);
-        mainContent.setStyle("-fx-background-color: #58b89c;");
+        mainContent.setStyle("-fx-background-color: #78f686;");
 
         BorderPane mainLayout = new BorderPane();
         mainLayout.setTop(topBar);
