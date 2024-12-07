@@ -1,5 +1,8 @@
 package com.mycompany.pos;
 
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -10,8 +13,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-
-import java.io.IOException;
 
 public class dataEntryOperatorLoginFrame extends Application {
 
@@ -40,7 +41,7 @@ public class dataEntryOperatorLoginFrame extends Application {
         centerBox.setSpacing(20);
 
         // Image
-        Image image = new Image("file:images/de.png/");
+        Image image = new Image("file:images/de.png/");  // Make sure the image path is correct
         ImageView imageView = new ImageView(image);
         imageView.setPreserveRatio(true);
         imageView.setFitWidth(450);
@@ -93,11 +94,16 @@ public class dataEntryOperatorLoginFrame extends Application {
             if (validateCredentials(username, password)) {
                 messageLabel.setTextFill(Color.GREEN);
                 messageLabel.setText("Login successful!");
+
+                // Open DataEntry page after successful login
+                new DataEntry().start(new Stage()); // Opens DataEntry after successful login
+                primaryStage.close();  // Close the current login window
             } else {
                 messageLabel.setTextFill(Color.RED);
                 messageLabel.setText("Invalid username or password.");
             }
         });
+
 
         centerBox.getChildren().add(loginGrid);
         mainLayout.setCenter(centerBox);
@@ -109,11 +115,37 @@ public class dataEntryOperatorLoginFrame extends Application {
         primaryStage.show();
     }
 
-    // Mock validation method
+    // MongoDB validation method
     private boolean validateCredentials(String username, String password) {
-        // Replace with actual validation logic (e.g., check a database)
-        return username.equals("superadmin") && password.equals("admin123") ||
-                username.equals("branchmanager") && password.equals("manager123");
+        try {
+            // Get the Employee collection using DatabaseConnection
+            DatabaseConnection dbConnection = new DatabaseConnection();
+            MongoCollection<Document> employeeCollection = dbConnection.getEmployeeCollection();
+
+            // Query to check credentials and role
+            Document query = new Document("name", username)
+                    .append("password", password)
+                    .append("role", "Data Entry Operator");
+
+            Document result = employeeCollection.find(query).first();
+
+            return result != null; // Return true if a match is found
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false; // Return false in case of any exception
+        }
+    }
+
+    // Function to launch DataEntry page
+    private void launchDataEntryPage(Stage primaryStage) {
+        try {
+            // Launch DataEntry as a new JavaFX application
+            DataEntry.launch(DataEntry.class); // Launch the DataEntry class
+
+            primaryStage.close();  // Close the login window after launching DataEntry
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
