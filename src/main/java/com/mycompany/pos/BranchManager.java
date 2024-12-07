@@ -17,7 +17,7 @@ public class BranchManager extends Application {
 
     public BranchManager() {
         DatabaseConnection dbConnection = new DatabaseConnection();
-        this.employeeCollection = dbConnection.getEmployeeCollection(); // Assuming getEmployeeCollection() returns the collection
+        this.employeeCollection = dbConnection.getEmployeeCollection(); // Connect to Employee Collection
     }
 
     @Override
@@ -27,6 +27,19 @@ public class BranchManager extends Application {
         // Header Section
         Label header = new Label("Branch Manager Dashboard");
         header.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #000000;");
+
+        // Back Button
+        Button backButton = new Button("Back");
+        backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #000000; -fx-text-fill: #58b89c;");
+        backButton.setOnAction(e -> {
+            new LoginBranch().start(new Stage()); // Go back to LoginBranch
+            primaryStage.close();
+        });
+
+        HBox topBar = new HBox(backButton);
+        topBar.setPadding(new Insets(10));
+        topBar.setAlignment(Pos.TOP_LEFT);
+        topBar.setStyle("-fx-background-color: #58b89c;");
 
         // Cashier Management Section
         Label cashierLabel = new Label("Cashier Management");
@@ -43,42 +56,7 @@ public class BranchManager extends Application {
         Button addCashierButton = new Button("Add Cashier");
         Button showCashiersButton = new Button("Show Cashiers");
 
-        // Cashier Table
-        TableView<Document> cashierTable = new TableView<>();
-        cashierTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        TableColumn<Document, String> cashierNameColumn = new TableColumn<>("Name");
-        cashierNameColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("name")));
-        cashierNameColumn.setEditable(true); // Make the name editable
-
-        TableColumn<Document, String> cashierRoleColumn = new TableColumn<>("Role");
-        cashierRoleColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("role")));
-        cashierRoleColumn.setEditable(false); // Make the role uneditable
-
-        TableColumn<Document, String> cashierPasswordColumn = new TableColumn<>("Password");
-        cashierPasswordColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("password")));
-        cashierPasswordColumn.setEditable(true); // Make the password editable
-
-        TableColumn<Document, Void> editCashierColumn = new TableColumn<>("Edit");
-        editCashierColumn.setCellFactory(param -> new TableCell<>() {
-            private final Button editButton = new Button("Edit");
-
-            {
-                editButton.setOnAction(e -> {
-                    Document cashier = getTableView().getItems().get(getIndex());
-                    // Create the Edit dialog
-                    showEditDialog(cashier, cashierTable);
-                });
-            }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                setGraphic(empty ? null : editButton);
-            }
-        });
-
-        cashierTable.getColumns().addAll(cashierNameColumn, cashierRoleColumn, cashierPasswordColumn, editCashierColumn);
+        TableView<Document> cashierTable = createEmployeeTable("Cashier");
 
         showCashiersButton.setOnAction(e -> {
             cashierTable.getItems().clear();
@@ -87,7 +65,6 @@ public class BranchManager extends Application {
 
         VBox cashierSection = new VBox(10, cashierLabel, cashierName, cashierPassword, addCashierButton, showCashiersButton, cashierTable);
         cashierSection.setAlignment(Pos.CENTER);
-        cashierSection.setVisible(false);
 
         // Data Entry Operator Management Section
         Label operatorLabel = new Label("Data Entry Operator Management");
@@ -104,42 +81,7 @@ public class BranchManager extends Application {
         Button addOperatorButton = new Button("Add Operator");
         Button showOperatorsButton = new Button("Show Operators");
 
-        // Operator Table
-        TableView<Document> operatorTable = new TableView<>();
-        operatorTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        TableColumn<Document, String> operatorNameColumn = new TableColumn<>("Name");
-        operatorNameColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("name")));
-        operatorNameColumn.setEditable(true); // Make the name editable
-
-        TableColumn<Document, String> operatorRoleColumn = new TableColumn<>("Role");
-        operatorRoleColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("role")));
-        operatorRoleColumn.setEditable(false); // Make the role uneditable
-
-        TableColumn<Document, String> operatorPasswordColumn = new TableColumn<>("Password");
-        operatorPasswordColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("password")));
-        operatorPasswordColumn.setEditable(true); // Make the password editable
-
-        TableColumn<Document, Void> editOperatorColumn = new TableColumn<>("Edit");
-        editOperatorColumn.setCellFactory(param -> new TableCell<>() {
-            private final Button editButton = new Button("Edit");
-
-            {
-                editButton.setOnAction(e -> {
-                    Document operator = getTableView().getItems().get(getIndex());
-                    // Create the Edit dialog
-                    showEditDialog(operator, operatorTable);
-                });
-            }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                setGraphic(empty ? null : editButton);
-            }
-        });
-
-        operatorTable.getColumns().addAll(operatorNameColumn, operatorRoleColumn, operatorPasswordColumn, editOperatorColumn);
+        TableView<Document> operatorTable = createEmployeeTable("Data Entry Operator");
 
         showOperatorsButton.setOnAction(e -> {
             operatorTable.getItems().clear();
@@ -148,16 +90,13 @@ public class BranchManager extends Application {
 
         VBox operatorSection = new VBox(10, operatorLabel, operatorName, operatorPassword, addOperatorButton, showOperatorsButton, operatorTable);
         operatorSection.setAlignment(Pos.CENTER);
-        operatorSection.setVisible(false);
 
-        // StackPane to overlay the sections
-        StackPane contentPane = new StackPane(cashierSection, operatorSection);
-        contentPane.setAlignment(Pos.CENTER);
-        contentPane.setPadding(new Insets(20));
-
-        // Buttons for toggling sections
+        // Toggle Buttons
         Button cashierManagementButton = new Button("Cashier");
         Button operatorManagementButton = new Button("Data Entry Operator");
+
+        cashierSection.setVisible(true);
+        operatorSection.setVisible(false);
 
         cashierManagementButton.setOnAction(e -> {
             cashierSection.setVisible(true);
@@ -172,98 +111,127 @@ public class BranchManager extends Application {
         HBox toggleButtons = new HBox(20, cashierManagementButton, operatorManagementButton);
         toggleButtons.setAlignment(Pos.CENTER);
 
-        // Main Layout
-        VBox layout = new VBox(20, header, toggleButtons, contentPane);
-        layout.setPadding(new Insets(20));
-        layout.setAlignment(Pos.TOP_CENTER);
-        layout.setStyle("-fx-background-color: #58b89c;");
+        // Layout
+        StackPane contentPane = new StackPane(cashierSection, operatorSection);
+        contentPane.setPadding(new Insets(20));
 
-        // Set up the scene and stage
-        Scene scene = new Scene(layout, 1440, 740);
+        VBox mainContent = new VBox(20, header, toggleButtons, contentPane);
+        mainContent.setPadding(new Insets(20));
+        mainContent.setAlignment(Pos.TOP_CENTER);
+        mainContent.setStyle("-fx-background-color: #58b89c;");
+
+        BorderPane mainLayout = new BorderPane();
+        mainLayout.setTop(topBar);
+        mainLayout.setCenter(mainContent);
+
+        // Scene
+        Scene scene = new Scene(mainLayout, 1440, 740);
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        // Add Cashier functionality
-        addCashierButton.setOnAction(e -> {
-            String name = cashierName.getText();
-            String password = cashierPassword.getText();
-            String role = "Cashier";  // Automatically set role as Cashier
-
-            if (!name.isEmpty() && !password.isEmpty()) {
-                Document employee = new Document("name", name)
-                        .append("role", role)
-                        .append("password", password)
-                        .append("branchId", "branch_id"); // Replace with actual branch ID
-                employeeCollection.insertOne(employee);
-                System.out.println("Cashier added: " + name + " with role " + role);
-                cashierName.clear();
-                cashierPassword.clear();
-            } else {
-                System.out.println("Name and password are required.");
-            }
-        });
-
-        // Add Operator functionality
-        addOperatorButton.setOnAction(e -> {
-            String name = operatorName.getText();
-            String password = operatorPassword.getText();
-            String role = "Data Entry Operator";  // Automatically set role as Data Entry Operator
-
-            if (!name.isEmpty() && !password.isEmpty()) {
-                Document employee = new Document("name", name)
-                        .append("role", role)
-                        .append("password", password)
-                        .append("branchId", "branch_id"); // Replace with actual branch ID
-                employeeCollection.insertOne(employee);
-                System.out.println("Operator added: " + name + " with role " + role);
-                operatorName.clear();
-                operatorPassword.clear();
-            } else {
-                System.out.println("Name and password are required.");
-            }
-        });
+        // Add Employee functionality
+        addCashierButton.setOnAction(e -> addEmployee(cashierName, cashierPassword, "Cashier"));
+        addOperatorButton.setOnAction(e -> addEmployee(operatorName, operatorPassword, "Data Entry Operator"));
     }
 
-    private void showEditDialog(Document employee, TableView<Document> table) {
-        Stage editStage = new Stage();
-        editStage.initModality(Modality.APPLICATION_MODAL);
-        editStage.setTitle("Edit Employee");
+    private TableView<Document> createEmployeeTable(String role) {
+        TableView<Document> table = new TableView<>();
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        TextField editName = new TextField(employee.getString("name"));
-        editName.setPromptText("Name");
+        TableColumn<Document, String> nameColumn = new TableColumn<>("Name");
+        nameColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("name")));
 
-        PasswordField editPassword = new PasswordField();
-        editPassword.setPromptText("Password");
-        editPassword.setText(employee.getString("password"));
+        TableColumn<Document, String> roleColumn = new TableColumn<>("Role");
+        roleColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("role")));
+
+        TableColumn<Document, String> passwordColumn = new TableColumn<>("Password");
+        passwordColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("password")));
+
+        TableColumn<Document, Void> editColumn = new TableColumn<>("Edit");
+        editColumn.setCellFactory(param -> new TableCell<>() {
+            private final Button editButton = new Button("Edit");
+
+            {
+                editButton.setOnAction(e -> {
+                    Document employee = getTableView().getItems().get(getIndex());
+                    showEditDialog(employee, role);
+                    getTableView().refresh();
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : editButton);
+            }
+        });
+
+        table.getColumns().addAll(nameColumn, roleColumn, passwordColumn, editColumn);
+        return table;
+    }
+
+    private void addEmployee(TextField nameField, PasswordField passwordField, String role) {
+        String name = nameField.getText();
+        String password = passwordField.getText();
+
+        if (!name.isEmpty() && !password.isEmpty()) {
+            Document employee = new Document("name", name)
+                    .append("role", role)
+                    .append("password", password)
+                    .append("branchId", "branch_id"); // Replace with the actual branch ID
+            employeeCollection.insertOne(employee);
+            System.out.println(role + " added: " + name);
+            nameField.clear();
+            passwordField.clear();
+        } else {
+            System.out.println("Name and password are required.");
+        }
+    }
+
+    private void showEditDialog(Document employee, String role) {
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle("Edit " + role);
+
+        VBox dialogLayout = new VBox(10);
+        dialogLayout.setPadding(new Insets(20));
+        dialogLayout.setAlignment(Pos.CENTER);
+
+        TextField nameField = new TextField(employee.getString("name"));
+        nameField.setPromptText("Name");
+
+        PasswordField passwordField = new PasswordField();
+        passwordField.setText(employee.getString("password"));
+        passwordField.setPromptText("Password");
 
         Button saveButton = new Button("Save");
-
         saveButton.setOnAction(e -> {
-            String newName = editName.getText();
-            String newPassword = editPassword.getText();
+            String newName = nameField.getText();
+            String newPassword = passwordField.getText();
 
             if (!newName.isEmpty() && !newPassword.isEmpty()) {
                 employee.put("name", newName);
                 employee.put("password", newPassword);
-                employeeCollection.updateOne(
-                        new Document("_id", employee.get("_id")),
-                        new Document("$set", employee)
-                );
-                table.refresh();
-                editStage.close();
-                System.out.println("Employee updated: " + newName);
+                employeeCollection.replaceOne(new Document("_id", employee.get("_id")), employee);
+                System.out.println(role + " updated: " + newName);
+                dialog.close();
             } else {
-                System.out.println("Name and password are required.");
+                showAlert(Alert.AlertType.ERROR, "Error", "Name and password cannot be empty.");
             }
         });
 
-        VBox dialogLayout = new VBox(10, editName, editPassword, saveButton);
-        dialogLayout.setAlignment(Pos.CENTER);
-        dialogLayout.setPadding(new Insets(20));
+        dialogLayout.getChildren().addAll(new Label("Name:"), nameField, new Label("Password:"), passwordField, saveButton);
+        Scene dialogScene = new Scene(dialogLayout, 300, 200);
+        dialog.setScene(dialogScene);
+        dialog.showAndWait();
+    }
 
-        Scene dialogScene = new Scene(dialogLayout, 1440, 740);
-        editStage.setScene(dialogScene);
-        editStage.show();
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     public static void main(String[] args) {

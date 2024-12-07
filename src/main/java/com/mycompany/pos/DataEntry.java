@@ -34,6 +34,19 @@ public class DataEntry extends Application {
         Label header = new Label("Data Entry Dashboard");
         header.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #000000;");
 
+        // Back Button at the Top-Left
+        Button backButton = new Button("Back");
+        backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #000000; -fx-text-fill: #ADD8E6;");
+        backButton.setOnAction(e -> {
+            new dataEntryOperatorLoginFrame().start(new Stage()); // Go back to DataEntryOperatorLoginFrame
+            primaryStage.close(); // Close the current DataEntry window
+        });
+
+        HBox topBar = new HBox(backButton);
+        topBar.setPadding(new Insets(10));
+        topBar.setAlignment(Pos.TOP_LEFT);
+        topBar.setStyle("-fx-background-color: #ADD8E6;");
+
         // Product Management Section
         Label productLabel = new Label("Product Management");
         productLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #000000;");
@@ -66,27 +79,21 @@ public class DataEntry extends Application {
 
         TableColumn<Document, String> productNameColumn = new TableColumn<>("Name");
         productNameColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("name")));
-        productNameColumn.setEditable(true);
 
         TableColumn<Document, String> productPriceColumn = new TableColumn<>("Price");
         productPriceColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("price")));
-        productPriceColumn.setEditable(true);
 
         TableColumn<Document, String> productCategoryColumn = new TableColumn<>("Category");
         productCategoryColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("category")));
-        productCategoryColumn.setEditable(true);
 
         TableColumn<Document, String> productDescriptionColumn = new TableColumn<>("Description");
         productDescriptionColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("description")));
-        productDescriptionColumn.setEditable(true);
 
         TableColumn<Document, String> productStockColumn = new TableColumn<>("Stock");
         productStockColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("stock")));
-        productStockColumn.setEditable(true);
 
         TableColumn<Document, String> productSKUColumn = new TableColumn<>("SKU");
         productSKUColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("sku")));
-        productSKUColumn.setEditable(true);
 
         TableColumn<Document, Void> editProductColumn = new TableColumn<>("Edit");
         editProductColumn.setCellFactory(param -> new TableCell<>() {
@@ -95,7 +102,6 @@ public class DataEntry extends Application {
             {
                 editButton.setOnAction(e -> {
                     Document product = getTableView().getItems().get(getIndex());
-                    // Create the Edit dialog
                     showEditDialog(product, productTable, true);
                 });
             }
@@ -138,11 +144,9 @@ public class DataEntry extends Application {
 
         TableColumn<Document, String> vendorNameColumn = new TableColumn<>("Name");
         vendorNameColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("name")));
-        vendorNameColumn.setEditable(true);
 
         TableColumn<Document, String> vendorContactColumn = new TableColumn<>("Contact");
         vendorContactColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("contact")));
-        vendorContactColumn.setEditable(true);
 
         TableColumn<Document, Void> editVendorColumn = new TableColumn<>("Edit");
         editVendorColumn.setCellFactory(param -> new TableCell<>() {
@@ -151,7 +155,6 @@ public class DataEntry extends Application {
             {
                 editButton.setOnAction(e -> {
                     Document vendor = getTableView().getItems().get(getIndex());
-                    // Create the Edit dialog
                     showEditDialog(vendor, vendorTable, false);
                 });
             }
@@ -197,7 +200,7 @@ public class DataEntry extends Application {
         toggleButtons.setAlignment(Pos.CENTER);
 
         // Main Layout
-        VBox layout = new VBox(20, header, toggleButtons, contentPane);
+        VBox layout = new VBox(20, topBar, header, toggleButtons, contentPane);
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.TOP_CENTER);
         layout.setStyle("-fx-background-color: #ADD8E6;");
@@ -230,6 +233,8 @@ public class DataEntry extends Application {
                 productDescription.clear();
                 productStock.clear();
                 productSKU.clear();
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error", "Please fill all the fields");
             }
         });
 
@@ -244,52 +249,84 @@ public class DataEntry extends Application {
                 vendorCollection.insertOne(vendor);
                 vendorName.clear();
                 vendorContact.clear();
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error", "Please fill all the fields");
             }
         });
     }
 
+    private void showAlert(Alert.AlertType alertType, String title, String content) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
     private void showEditDialog(Document document, TableView<Document> table, boolean isProduct) {
         Stage editStage = new Stage();
-        editStage.setTitle(isProduct ? "Edit Product" : "Edit Vendor");
+        editStage.setTitle("Edit " + (isProduct ? "Product" : "Vendor"));
 
-        // Form fields based on whether it's a product or vendor
+        VBox editLayout = new VBox(10);
+        editLayout.setPadding(new Insets(20));
+        editLayout.setAlignment(Pos.CENTER);
+
+        // Editable Fields
         TextField nameField = new TextField(document.getString("name"));
-        TextField priceField = new TextField(isProduct ? document.getString("price") : "");
-        TextField categoryField = new TextField(isProduct ? document.getString("category") : "");
-        TextField descriptionField = new TextField(isProduct ? document.getString("description") : "");
-        TextField stockField = new TextField(isProduct ? document.getString("stock") : "");
-        TextField skuField = new TextField(isProduct ? document.getString("sku") : "");
-        TextField contactField = new TextField(isProduct ? "" : document.getString("contact"));
+        nameField.setPromptText("Name");
+
+        TextField contactOrPriceField = new TextField(document.getString(isProduct ? "price" : "contact"));
+        contactOrPriceField.setPromptText(isProduct ? "Price" : "Contact");
+
+        TextField categoryField = isProduct ? new TextField(document.getString("category")) : null;
+        if (isProduct) categoryField.setPromptText("Category");
+
+        TextField descriptionField = isProduct ? new TextField(document.getString("description")) : null;
+        if (isProduct) descriptionField.setPromptText("Description");
+
+        TextField stockField = isProduct ? new TextField(document.getString("stock")) : null;
+        if (isProduct) stockField.setPromptText("Stock");
+
+        TextField skuField = isProduct ? new TextField(document.getString("sku")) : null;
+        if (isProduct) skuField.setPromptText("SKU");
 
         Button saveButton = new Button("Save");
         saveButton.setOnAction(e -> {
-            // Save the edited document back to MongoDB
+            // Update document with new values
+            document.put("name", nameField.getText());
             if (isProduct) {
-                document.put("name", nameField.getText());
-                document.put("price", priceField.getText());
+                document.put("price", contactOrPriceField.getText());
                 document.put("category", categoryField.getText());
                 document.put("description", descriptionField.getText());
                 document.put("stock", stockField.getText());
                 document.put("sku", skuField.getText());
                 productCollection.replaceOne(new Document("_id", document.get("_id")), document);
             } else {
-                document.put("name", nameField.getText());
-                document.put("contact", contactField.getText());
+                document.put("contact", contactOrPriceField.getText());
                 vendorCollection.replaceOne(new Document("_id", document.get("_id")), document);
             }
 
-            table.refresh();
+            // Refresh Table
+            table.getItems().clear();
+            (isProduct ? productCollection : vendorCollection).find().forEach(table.getItems()::add);
+
             editStage.close();
         });
 
-        VBox dialogLayout = new VBox(10, nameField, priceField, categoryField, descriptionField, stockField, skuField, contactField, saveButton);
-        dialogLayout.setAlignment(Pos.CENTER);
-        dialogLayout.setPadding(new Insets(20));
+        // Add fields to the layout
+        editLayout.getChildren().add(nameField);
+        editLayout.getChildren().add(contactOrPriceField);
+        if (isProduct) {
+            editLayout.getChildren().addAll(categoryField, descriptionField, stockField, skuField);
+        }
+        editLayout.getChildren().add(saveButton);
 
-        Scene dialogScene = new Scene(dialogLayout, 300, 300);
-        editStage.setScene(dialogScene);
-        editStage.show();
+        // Scene and Stage Setup
+        Scene scene = new Scene(editLayout, 400, isProduct ? 400 : 200);
+        editStage.setScene(scene);
+        editStage.initModality(Modality.APPLICATION_MODAL);
+        editStage.showAndWait();
     }
+
 
     public static void main(String[] args) {
         launch(args);
