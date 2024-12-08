@@ -110,7 +110,7 @@ public class LoginAdmin extends Application {
         primaryStage.show();
     }
 
-    private boolean validateAdmin(String username, String password) {
+    public boolean validateAdmin(String username, String password) {
         MongoCollection<Document> collection = dbConnection.getAdminCollection();
         Document query = new Document("username", username).append("password", password);
         Document result = collection.find(query).first();

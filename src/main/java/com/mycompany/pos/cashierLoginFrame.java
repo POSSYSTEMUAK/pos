@@ -115,7 +115,7 @@ public class cashierLoginFrame extends Application {
     }
 
     // MongoDB validation method
-    private boolean validateCashier(String username, String password) {
+    public boolean validateCashier(String username, String password) {
         try {
             // Connect to the MongoDB employee collection
             DatabaseConnection dbConnection = new DatabaseConnection();

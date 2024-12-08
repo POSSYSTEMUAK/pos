@@ -116,7 +116,7 @@ public class dataEntryOperatorLoginFrame extends Application {
     }
 
     // MongoDB validation method
-    private boolean validateCredentials(String username, String password) {
+    public boolean validateCredentials(String username, String password) {
         try {
             // Get the Employee collection using DatabaseConnection
             DatabaseConnection dbConnection = new DatabaseConnection();

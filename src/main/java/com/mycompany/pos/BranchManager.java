@@ -134,7 +134,7 @@ public abstract class BranchManager extends Application {
         addOperatorButton.setOnAction(e -> addEmployee(operatorName, operatorPassword, "Data Entry Operator"));
     }
 
-    private TableView<Document> createEmployeeTable(String role) {
+    public TableView<Document> createEmployeeTable(String role) {
         TableView<Document> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
