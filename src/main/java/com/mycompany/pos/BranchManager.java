@@ -11,7 +11,7 @@ import javafx.stage.*;
 import org.bson.Document;
 import com.mongodb.client.MongoCollection;
 
-public class BranchManager extends Application {
+public abstract class BranchManager extends Application {
 
     private final MongoCollection<Document> employeeCollection;
 
@@ -171,7 +171,7 @@ public class BranchManager extends Application {
         return table;
     }
 
-    private void addEmployee(TextField nameField, PasswordField passwordField, String role) {
+    void addEmployee(TextField nameField, PasswordField passwordField, String role) {
         String name = nameField.getText();
         String password = passwordField.getText();
 
@@ -189,7 +189,7 @@ public class BranchManager extends Application {
         }
     }
 
-    private void showEditDialog(Document employee, String role) {
+    void showEditDialog(Document employee, String role) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Edit " + role);
@@ -238,4 +238,6 @@ public class BranchManager extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+
+    public abstract MongoCollection<Document> getEmployeeCollection();
 }

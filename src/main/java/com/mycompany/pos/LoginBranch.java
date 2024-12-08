@@ -85,7 +85,12 @@ public class LoginBranch extends Application {
             if (validateBranchManager(username, password)) {
                 messageLabel.setTextFill(Color.GREEN);
                 messageLabel.setText("Login successful!");
-                new BranchManager().start(new Stage()); // Opens BranchManager after successful login
+                new BranchManager() {
+                    @Override
+                    public MongoCollection<Document> getEmployeeCollection() {
+                        return null;
+                    }
+                }.start(new Stage()); // Opens BranchManager after successful login
                 primaryStage.close();
             } else {
                 messageLabel.setTextFill(Color.RED);
