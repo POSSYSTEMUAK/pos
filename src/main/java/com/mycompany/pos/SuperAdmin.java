@@ -9,6 +9,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.bson.Document;
 
@@ -23,7 +24,7 @@ public class SuperAdmin extends Application {
         primaryStage.setTitle("Super Admin Dashboard");
 
         Button backButton = new Button("Back");
-        backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #d9534f; -fx-text-fill: white;");
+        backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #000000; -fx-text-fill: white;");
         backButton.setOnAction(e -> {
             new LoginAdmin().start(new Stage());
             primaryStage.close();
@@ -69,6 +70,7 @@ public class SuperAdmin extends Application {
         TableColumn<Document, String> branchCityColumn = new TableColumn<>("Branch City");
         branchCityColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("branchCity")));
 
+        // Updated edit functionality for branches
         TableColumn<Document, Void> editBranchColumn = new TableColumn<>("Edit");
         editBranchColumn.setCellFactory(param -> new TableCell<>() {
             private final Button editButton = new Button("Edit");
@@ -76,9 +78,8 @@ public class SuperAdmin extends Application {
             {
                 editButton.setOnAction(e -> {
                     Document branch = getTableView().getItems().get(getIndex());
-                    branchName.setText(branch.getString("branchName"));
-                    branchCityDropdown.setValue(branch.getString("branchCity"));
-                    System.out.println("Editing Branch: " + branch.toJson());
+                    showEditDialog(branch, true); // true indicates branch
+                    getTableView().refresh(); // Refresh the table after editing
                 });
             }
 
@@ -86,6 +87,7 @@ public class SuperAdmin extends Application {
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 setGraphic(empty ? null : editButton);
+                setAlignment(Pos.CENTER);
             }
         });
 
@@ -130,6 +132,7 @@ public class SuperAdmin extends Application {
         TableColumn<Document, String> managerEmailColumn = new TableColumn<>("Manager Email");
         managerEmailColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("managerEmail")));
 
+        // Updated edit functionality for managers
         TableColumn<Document, Void> editManagerColumn = new TableColumn<>("Edit");
         editManagerColumn.setCellFactory(param -> new TableCell<>() {
             private final Button editButton = new Button("Edit");
@@ -137,10 +140,8 @@ public class SuperAdmin extends Application {
             {
                 editButton.setOnAction(e -> {
                     Document manager = getTableView().getItems().get(getIndex());
-                    managerName.setText(manager.getString("managerName"));
-                    managerEmail.setText(manager.getString("managerEmail"));
-                    managerPassword.setText(manager.getString("managerPassword"));
-                    System.out.println("Editing Manager: " + manager.toJson());
+                    showEditDialog(manager, false); // false indicates manager
+                    getTableView().refresh(); // Refresh the table after editing
                 });
             }
 
@@ -148,6 +149,7 @@ public class SuperAdmin extends Application {
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 setGraphic(empty ? null : editButton);
+                setAlignment(Pos.CENTER);
             }
         });
 
@@ -233,6 +235,88 @@ public class SuperAdmin extends Application {
         Scene scene = new Scene(layout, 1440, 740);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private void showEditDialog(Document document, boolean isBranch) {
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle(isBranch ? "Edit Branch" : "Edit Manager");
+
+        VBox dialogLayout = new VBox(10);
+        dialogLayout.setPadding(new Insets(20));
+        dialogLayout.setAlignment(Pos.CENTER);
+
+        TextField nameField = new TextField(document.getString(isBranch ? "branchName" : "managerName"));
+        nameField.setPromptText(isBranch ? "Branch Name" : "Manager Name");
+
+        ComboBox<String> cityDropdown;
+        TextField emailField;
+        PasswordField passwordField;
+
+        if (isBranch) {
+            passwordField = null;
+            emailField = null;
+            cityDropdown = new ComboBox<>();
+            cityDropdown.getItems().addAll("Karachi", "Lahore", "Islamabad", "Peshawar", "Quetta");
+            cityDropdown.setValue(document.getString("branchCity"));
+            dialogLayout.getChildren().addAll(new Label("Branch Name:"), nameField, new Label("City:"), cityDropdown);
+        } else {
+            cityDropdown = null;
+            emailField = new TextField(document.getString("managerEmail"));
+            emailField.setPromptText("Manager Email");
+
+            passwordField = new PasswordField();
+            passwordField.setText(document.getString("managerPassword"));
+            dialogLayout.getChildren().addAll(new Label("Manager Name:"), nameField, new Label("Email:"), emailField, new Label("Password:"), passwordField);
+        }
+
+        Button saveButton = new Button("Save");
+        saveButton.setOnAction(e -> {
+            if (isBranch) {
+                String branchName = nameField.getText();
+                String branchCity = cityDropdown.getValue();
+
+                if (!branchName.isEmpty() && branchCity != null) {
+                    document.put("branchName", branchName);
+                    document.put("branchCity", branchCity);
+
+                    MongoCollection<Document> branches = database.getCollection("Branches");
+                    branches.replaceOne(new Document("_id", document.get("_id")), document);
+                    dialog.close();
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error", "All fields must be filled.");
+                }
+            } else {
+                String managerName = nameField.getText();
+                String managerEmail = emailField.getText();
+                String managerPassword = passwordField.getText();
+
+                if (!managerName.isEmpty() && !managerEmail.isEmpty() && !managerPassword.isEmpty()) {
+                    document.put("managerName", managerName);
+                    document.put("managerEmail", managerEmail);
+                    document.put("managerPassword", managerPassword);
+
+                    MongoCollection<Document> managers = database.getCollection("managers");
+                    managers.replaceOne(new Document("_id", document.get("_id")), document);
+                    dialog.close();
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error", "All fields must be filled.");
+                }
+            }
+        });
+
+        dialogLayout.getChildren().add(saveButton);
+        Scene dialogScene = new Scene(dialogLayout, 400, isBranch ? 250 : 300);
+        dialog.setScene(dialogScene);
+        dialog.showAndWait();
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     public static void main(String[] args) {

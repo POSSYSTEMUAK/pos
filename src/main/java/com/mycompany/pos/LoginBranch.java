@@ -20,11 +20,11 @@ public class LoginBranch extends Application {
     public void start(Stage primaryStage) {
         // Main layout container
         BorderPane mainLayout = new BorderPane();
-        mainLayout.setStyle("-fx-background-color: #58b89c;");
+        mainLayout.setStyle("-fx-background-color: #78f686;");
 
         // Back Button in the Top-Left
         Button backButton = new Button("Back");
-        backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #d9534f; -fx-text-fill: white;");
+        backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #000000; -fx-text-fill: #78f686;");
         backButton.setOnAction(e -> {
             new LoginForm().start(new Stage()); // Navigate back to LoginFrame
             primaryStage.close(); // Close the current stage
@@ -85,7 +85,12 @@ public class LoginBranch extends Application {
             if (validateBranchManager(username, password)) {
                 messageLabel.setTextFill(Color.GREEN);
                 messageLabel.setText("Login successful!");
-                new BranchManager().start(new Stage()); // Opens BranchManager after successful login
+                new BranchManager() {
+                    @Override
+                    public MongoCollection<Document> getEmployeeCollection() {
+                        return null;
+                    }
+                }.start(new Stage()); // Opens BranchManager after successful login
                 primaryStage.close();
             } else {
                 messageLabel.setTextFill(Color.RED);

@@ -1,5 +1,8 @@
 package com.mycompany.pos;
 
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -21,7 +24,7 @@ public class cashierLoginFrame extends Application {
 
         // Back Button in the Top-Left
         Button backButton = new Button("Back");
-        backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #d9534f; -fx-text-fill: white;");
+        backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #000000; -fx-text-fill: #D8BFD8;");
         backButton.setOnAction(e -> {
             new LoginForm().start(new Stage()); // Navigate back to LoginFrame
             primaryStage.close(); // Close the current stage
@@ -88,12 +91,16 @@ public class cashierLoginFrame extends Application {
             String username = usernameField.getText();
             String password = passwordField.getText();
 
-            if (validateCredentials(username, password)) {
+            if (validateCashier(username, password)) {
                 messageLabel.setTextFill(Color.GREEN);
                 messageLabel.setText("Login successful!");
+
+                // Open Cashier page after successful login
+                new cashier().start(new Stage());
+                primaryStage.close(); // Close the current window
             } else {
                 messageLabel.setTextFill(Color.RED);
-                messageLabel.setText("Invalid username or password.");
+                messageLabel.setText("Invalid username, password, or role.");
             }
         });
 
@@ -102,16 +109,30 @@ public class cashierLoginFrame extends Application {
 
         // Set up the scene and stage
         Scene scene = new Scene(mainLayout, 1440, 740);
-        primaryStage.setTitle("Login Screen");
+        primaryStage.setTitle("Cashier Login Screen");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    // Mock validation method
-    private boolean validateCredentials(String username, String password) {
-        // Replace with actual validation logic (e.g., check a database)
-        return username.equals("superadmin") && password.equals("admin123") ||
-                username.equals("branchmanager") && password.equals("manager123");
+    // MongoDB validation method
+    private boolean validateCashier(String username, String password) {
+        try {
+            // Connect to the MongoDB employee collection
+            DatabaseConnection dbConnection = new DatabaseConnection();
+            MongoCollection<Document> employeeCollection = dbConnection.getEmployeeCollection();
+
+            // Query to check credentials and role (Cashier)
+            Document query = new Document("name", username)
+                    .append("password", password)
+                    .append("role", "Cashier");
+
+            Document result = employeeCollection.find(query).first();
+
+            return result != null; // Return true if a match is found
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false; // Return false in case of any exception
+        }
     }
 
     public static void main(String[] args) {
