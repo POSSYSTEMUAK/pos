@@ -14,7 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class LoginBranch extends Application {
-    private DatabaseConnection dbConnection = new DatabaseConnection();
+    private final DatabaseConnection dbConnection = new DatabaseConnection();
 
     @Override
     public void start(Stage primaryStage) {
@@ -108,7 +108,7 @@ public class LoginBranch extends Application {
         primaryStage.show();
     }
 
-    private boolean validateBranchManager(String username, String password) {
+    public boolean validateBranchManager(String username, String password) {
         MongoCollection<Document> collection = dbConnection.getManagerCollection();
 
         // Query to find a manager with matching name and password
