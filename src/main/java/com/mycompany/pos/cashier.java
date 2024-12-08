@@ -16,27 +16,25 @@ import org.bson.Document;
 
 public class cashier extends Application {
 
-    private MongoCollection<Document> productCollection; // Product collection from DB
-    private TableView<SaleItem> salesTable; // Table to display selected products
-    private ObservableList<SaleItem> saleItems; // Observable list to hold sales items
-    private Label totalLabel; // Label to display total price
+    private MongoCollection<Document> productCollection;
+    private TableView<SaleItem> salesTable;
+    private ObservableList<SaleItem> saleItems;
+    private Label totalLabel;
     private double totalAmount = 0.0;
 
     @Override
     public void start(Stage primaryStage) {
         DatabaseConnection dbConnection = new DatabaseConnection();
-        productCollection = dbConnection.getProductCollection(); // Connect to products collection
+        productCollection = dbConnection.getProductCollection();
 
-        // Main Layout
         BorderPane mainLayout = new BorderPane();
         mainLayout.setStyle("-fx-background-color: #D8BFD8;");
 
-        // Back Button in the Top-Left
         Button backButton = new Button("Back");
         backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #000000; -fx-text-fill: #D8BFD8 ;");
         backButton.setOnAction(e -> {
-            new cashierLoginFrame().start(new Stage()); // Navigate back to Cashier Login Frame
-            primaryStage.close(); // Close the current stage
+            new cashierLoginFrame().start(new Stage());
+            primaryStage.close();
         });
 
         HBox topBar = new HBox(backButton);
@@ -44,16 +42,13 @@ public class cashier extends Application {
         topBar.setAlignment(Pos.TOP_LEFT);
         mainLayout.setTop(topBar);
 
-        // Center Layout
         VBox centerLayout = new VBox(10);
         centerLayout.setPadding(new Insets(20));
         centerLayout.setAlignment(Pos.TOP_CENTER);
 
-        // Title
         Label titleLabel = new Label("Sales Entry");
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
-        // Product Input Fields
         HBox inputBox = new HBox(10);
         inputBox.setAlignment(Pos.CENTER);
 
@@ -67,7 +62,6 @@ public class cashier extends Application {
 
         inputBox.getChildren().addAll(productNameField, quantityField, addButton);
 
-        // Table to display selected sales items
         salesTable = new TableView<>();
         salesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         saleItems = FXCollections.observableArrayList();
@@ -84,7 +78,6 @@ public class cashier extends Application {
         salesTable.getColumns().addAll(productNameColumn, quantityColumn, priceColumn);
         salesTable.setItems(saleItems);
 
-        // Total Price Section
         totalLabel = new Label("Total: 0.0 PKR");
         totalLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
@@ -94,7 +87,6 @@ public class cashier extends Application {
         HBox billBox = new HBox(10, totalLabel, generateBillButton);
         billBox.setAlignment(Pos.CENTER);
 
-        // Add Product Button Action
         addButton.setOnAction(e -> {
             String productName = productNameField.getText();
             String quantityText = quantityField.getText();
@@ -107,14 +99,12 @@ public class cashier extends Application {
             try {
                 int quantity = Integer.parseInt(quantityText);
 
-                // Find product in database
                 Document product = productCollection.find(Filters.eq("name", productName)).first();
 
                 if (product != null) {
                     double price = Double.parseDouble(product.getString("price").replace(" PKR", ""));
                     double totalPrice = price * quantity;
 
-                    // Deduct stock in database
                     int currentStock = Integer.parseInt(product.getString("stock"));
                     if (currentStock >= quantity) {
                         productCollection.updateOne(
@@ -122,10 +112,8 @@ public class cashier extends Application {
                                 new Document("$set", new Document("stock", String.valueOf(currentStock - quantity)))
                         );
 
-                        // Add to table
                         saleItems.add(new SaleItem(productName, String.valueOf(quantity), String.format("%.2f PKR", totalPrice)));
 
-                        // Update total amount
                         totalAmount += totalPrice;
                         totalLabel.setText("Total: " + String.format("%.2f PKR", totalAmount));
 
@@ -142,7 +130,6 @@ public class cashier extends Application {
             }
         });
 
-        // Generate Bill Action
         generateBillButton.setOnAction(e -> {
             if (saleItems.isEmpty()) {
                 showAlert(Alert.AlertType.WARNING, "Warning", "No products added to generate a bill.");
@@ -154,13 +141,10 @@ public class cashier extends Application {
             }
         });
 
-        // Assemble Center Layout
         centerLayout.getChildren().addAll(titleLabel, inputBox, salesTable, billBox);
 
-        // Add center layout to main layout
         mainLayout.setCenter(centerLayout);
 
-        // Scene
         Scene scene = new Scene(mainLayout, 1440, 740);
         primaryStage.setTitle("Cashier Dashboard");
         primaryStage.setScene(scene);
@@ -179,7 +163,6 @@ public class cashier extends Application {
         launch(args);
     }
 
-    // Inner class to hold sales data
     public static class SaleItem {
         private final SimpleStringProperty productName;
         private final SimpleStringProperty quantity;

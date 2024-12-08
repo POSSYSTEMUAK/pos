@@ -24,13 +24,11 @@ public class LoginForm extends Application {
         mainLayout.setAlignment(Pos.CENTER);
         mainLayout.setStyle("-fx-background-color: #FFFFFF;");
 
-        // Add image
         Image image = new Image("file:metro icon.png");
         ImageView imageView = new ImageView(image);
         imageView.setPreserveRatio(true);
-        imageView.setFitWidth(300); // Adjust image size if needed
+        imageView.setFitWidth(300);
 
-        // Buttons with custom style
         Button superAdminBtn = createRoundedButton("SUPER ADMIN");
         Button branchManagerBtn = createRoundedButton("BRANCH MANAGER");
         Button dataEntryOperatorBtn = createRoundedButton("DATA ENTRY OPERATOR");
@@ -42,16 +40,15 @@ public class LoginForm extends Application {
         dataEntryOperatorBtn.setOnAction(e -> openFrame(new dataEntryOperatorLoginFrame(), primaryStage));
         cashierBtn.setOnAction(e -> openFrame(new cashierLoginFrame(), primaryStage));
 
-        // Add components to layout
+        // layout
         mainLayout.getChildren().addAll(imageView, superAdminBtn, branchManagerBtn, dataEntryOperatorBtn, cashierBtn);
 
-        // Scene setup
         Scene scene = new Scene(mainLayout, 1440, 740);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    // Helper method to create styled rounded buttons
+    // rounded buttons
     private Button createRoundedButton(String text) {
         Button button = new Button(text);
         button.setStyle("-fx-background-color: #FFCC00; -fx-text-fill: black; -fx-font-size: 16px; " +
@@ -60,12 +57,12 @@ public class LoginForm extends Application {
         return button;
     }
 
-    // Helper method to open a new frame
+    // new frame
     private void openFrame(Application app, Stage currentStage) {
         try {
             Stage newStage = new Stage();
             app.start(newStage);
-            currentStage.close(); // Close the current stage
+            currentStage.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }

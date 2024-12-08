@@ -18,40 +18,35 @@ import java.util.concurrent.Executors;
 
 public class Splashscreen extends Application {
 
-    private static final int SPLASH_DURATION = 5000; // Duration in milliseconds
+    private static final int SPLASH_DURATION = 2500;
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.initStyle(StageStyle.UNDECORATED); // No window decorations
+        primaryStage.initStyle(StageStyle.UNDECORATED);
 
-        // Layout for splash screen
+        // Layout
         VBox layout = new VBox(10);
         layout.setAlignment(Pos.CENTER);
         layout.setStyle("-fx-background-color: white;");
 
-        // Image for splash screen
-        ImageView logo = new ImageView(new Image("file:metro icon.png"));
+        ImageView logo = new ImageView(new Image("file:images/metro icon.png/"));
         logo.setFitWidth(200);
         logo.setPreserveRatio(true);
 
-        // Welcome text
         Label welcomeText = new Label("WELCOME TO METRO CASH AND CARRY");
         welcomeText.setFont(new Font("Sans-Serif", 20));
         welcomeText.setTextFill(Color.BLACK);
 
-        // Progress bar
         ProgressBar progressBar = new ProgressBar(0);
         progressBar.setPrefWidth(300);
+        progressBar.setStyle("-fx-accent: #FFCC00;");
 
-        // Add components to layout
         layout.getChildren().addAll(welcomeText, logo, progressBar);
 
-        // Scene and stage setup
         Scene scene = new Scene(layout, 500, 250);
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        // Update progress bar and switch to LoginForm after SPLASH_DURATION
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(() -> {
             for (int i = 1; i <= 100; i++) {
@@ -64,7 +59,6 @@ public class Splashscreen extends Application {
                 javafx.application.Platform.runLater(() -> progressBar.setProgress(progress / 100.0));
             }
 
-            // After splash screen, show the LoginForm
             javafx.application.Platform.runLater(() -> {
                 primaryStage.close(); // Close splash screen
                 try {

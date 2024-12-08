@@ -18,16 +18,15 @@ public class LoginBranch extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Main layout container
+        // Main layout
         BorderPane mainLayout = new BorderPane();
         mainLayout.setStyle("-fx-background-color: #78f686;");
 
-        // Back Button in the Top-Left
         Button backButton = new Button("Back");
         backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #000000; -fx-text-fill: #78f686;");
         backButton.setOnAction(e -> {
-            new LoginForm().start(new Stage()); // Navigate back to LoginFrame
-            primaryStage.close(); // Close the current stage
+            new LoginForm().start(new Stage());
+            primaryStage.close();
         });
 
         HBox topBar = new HBox(backButton);
@@ -35,12 +34,10 @@ public class LoginBranch extends Application {
         topBar.setAlignment(Pos.TOP_LEFT);
         mainLayout.setTop(topBar);
 
-        // Image and Login Form Centered Together
         VBox centerBox = new VBox();
         centerBox.setAlignment(Pos.CENTER);
         centerBox.setSpacing(20);
 
-        // Image
         Image image = new Image("file:images/bm.png/");
         ImageView imageView = new ImageView(image);
         imageView.setPreserveRatio(true);
@@ -56,6 +53,8 @@ public class LoginBranch extends Application {
         Label titleLabel = new Label("Branch Manager");
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         loginGrid.add(titleLabel, 0, 0, 2, 1);
+        GridPane.setHalignment(titleLabel, javafx.geometry.HPos.CENTER);
+        GridPane.setValignment(titleLabel, javafx.geometry.VPos.CENTER);
 
         Label usernameLabel = new Label("Name:");
         usernameLabel.setStyle("-fx-font-size: 20px;");
@@ -101,7 +100,6 @@ public class LoginBranch extends Application {
         centerBox.getChildren().add(loginGrid);
         mainLayout.setCenter(centerBox);
 
-        // Scene Setup
         Scene scene = new Scene(mainLayout, 1440, 740);
         primaryStage.setTitle("Branch Manager Login");
         primaryStage.setScene(scene);
@@ -111,13 +109,11 @@ public class LoginBranch extends Application {
     public boolean validateBranchManager(String username, String password) {
         MongoCollection<Document> collection = dbConnection.getManagerCollection();
 
-        // Query to find a manager with matching name and password
         Document query = new Document("managerName", username)
                 .append("managerPassword", password);
 
-        // Check if a matching document exists
         Document result = collection.find(query).first();
-        return result != null; // Returns true if a matching document is found
+        return result != null;
     }
 
     public static void main(String[] args) {

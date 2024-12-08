@@ -17,22 +17,20 @@ public abstract class BranchManager extends Application {
 
     public BranchManager() {
         DatabaseConnection dbConnection = new DatabaseConnection();
-        this.employeeCollection = dbConnection.getEmployeeCollection(); // Connect to Employee Collection
+        this.employeeCollection = dbConnection.getEmployeeCollection();
     }
 
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Branch Manager Dashboard");
 
-        // Header Section
         Label header = new Label("Branch Manager Dashboard");
         header.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #000000;");
 
-        // Back Button
         Button backButton = new Button("Back");
         backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #000000; -fx-text-fill: #78f686;");
         backButton.setOnAction(e -> {
-            new LoginBranch().start(new Stage()); // Go back to LoginBranch
+            new LoginBranch().start(new Stage());
             primaryStage.close();
         });
 
@@ -91,7 +89,6 @@ public abstract class BranchManager extends Application {
         VBox operatorSection = new VBox(10, operatorLabel, operatorName, operatorPassword, addOperatorButton, showOperatorsButton, operatorTable);
         operatorSection.setAlignment(Pos.CENTER);
 
-        // Toggle Buttons
         Button cashierManagementButton = new Button("Cashier");
         Button operatorManagementButton = new Button("Data Entry Operator");
 
@@ -111,7 +108,6 @@ public abstract class BranchManager extends Application {
         HBox toggleButtons = new HBox(20, cashierManagementButton, operatorManagementButton);
         toggleButtons.setAlignment(Pos.CENTER);
 
-        // Layout
         StackPane contentPane = new StackPane(cashierSection, operatorSection);
         contentPane.setPadding(new Insets(20));
 
@@ -124,12 +120,10 @@ public abstract class BranchManager extends Application {
         mainLayout.setTop(topBar);
         mainLayout.setCenter(mainContent);
 
-        // Scene
         Scene scene = new Scene(mainLayout, 1440, 740);
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        // Add Employee functionality
         addCashierButton.setOnAction(e -> addEmployee(cashierName, cashierPassword, "Cashier"));
         addOperatorButton.setOnAction(e -> addEmployee(operatorName, operatorPassword, "Data Entry Operator"));
     }
@@ -179,7 +173,7 @@ public abstract class BranchManager extends Application {
             Document employee = new Document("name", name)
                     .append("role", role)
                     .append("password", password)
-                    .append("branchId", "branch_id"); // Replace with the actual branch ID
+                    .append("branchId", "branch_id");
             employeeCollection.insertOne(employee);
             System.out.println(role + " added: " + name);
             nameField.clear();

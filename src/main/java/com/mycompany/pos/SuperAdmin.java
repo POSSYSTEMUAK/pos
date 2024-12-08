@@ -33,7 +33,6 @@ public class SuperAdmin extends Application {
         HBox topBar = new HBox(backButton);
         topBar.setAlignment(Pos.TOP_LEFT);
 
-        // Header Section
         Label header = new Label("Super Admin Dashboard");
         header.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #000000;");
 
@@ -70,7 +69,6 @@ public class SuperAdmin extends Application {
         TableColumn<Document, String> branchCityColumn = new TableColumn<>("Branch City");
         branchCityColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("branchCity")));
 
-        // Updated edit functionality for branches
         TableColumn<Document, Void> editBranchColumn = new TableColumn<>("Edit");
         editBranchColumn.setCellFactory(param -> new TableCell<>() {
             private final Button editButton = new Button("Edit");
@@ -78,8 +76,8 @@ public class SuperAdmin extends Application {
             {
                 editButton.setOnAction(e -> {
                     Document branch = getTableView().getItems().get(getIndex());
-                    showEditDialog(branch, true); // true indicates branch
-                    getTableView().refresh(); // Refresh the table after editing
+                    showEditDialog(branch, true);
+                    getTableView().refresh();
                 });
             }
 
@@ -132,7 +130,6 @@ public class SuperAdmin extends Application {
         TableColumn<Document, String> managerEmailColumn = new TableColumn<>("Manager Email");
         managerEmailColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getString("managerEmail")));
 
-        // Updated edit functionality for managers
         TableColumn<Document, Void> editManagerColumn = new TableColumn<>("Edit");
         editManagerColumn.setCellFactory(param -> new TableCell<>() {
             private final Button editButton = new Button("Edit");
@@ -140,8 +137,8 @@ public class SuperAdmin extends Application {
             {
                 editButton.setOnAction(e -> {
                     Document manager = getTableView().getItems().get(getIndex());
-                    showEditDialog(manager, false); // false indicates manager
-                    getTableView().refresh(); // Refresh the table after editing
+                    showEditDialog(manager, false);
+                    getTableView().refresh();
                 });
             }
 

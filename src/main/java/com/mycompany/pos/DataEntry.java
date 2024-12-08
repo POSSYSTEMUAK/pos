@@ -30,16 +30,14 @@ public class DataEntry extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Data Entry Dashboard");
 
-        // Header Section
         Label header = new Label("Data Entry Dashboard");
         header.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #000000;");
 
-        // Back Button at the Top-Left
         Button backButton = new Button("Back");
         backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #000000; -fx-text-fill: #ADD8E6;");
         backButton.setOnAction(e -> {
-            new dataEntryOperatorLoginFrame().start(new Stage()); // Go back to DataEntryOperatorLoginFrame
-            primaryStage.close(); // Close the current DataEntry window
+            new dataEntryOperatorLoginFrame().start(new Stage());
+            primaryStage.close();
         });
 
         HBox topBar = new HBox(backButton);
@@ -179,12 +177,11 @@ public class DataEntry extends Application {
         vendorSection.setAlignment(Pos.CENTER);
         vendorSection.setVisible(false);
 
-        // StackPane to overlay the sections
+        //overlay
         StackPane contentPane = new StackPane(productSection, vendorSection);
         contentPane.setAlignment(Pos.CENTER);
         contentPane.setPadding(new Insets(20));
 
-        // Buttons for toggling sections
         Button productManagementButton = new Button("Product");
         Button vendorManagementButton = new Button("Vendor");
 
@@ -201,18 +198,15 @@ public class DataEntry extends Application {
         HBox toggleButtons = new HBox(20, productManagementButton, vendorManagementButton);
         toggleButtons.setAlignment(Pos.CENTER);
 
-        // Main Layout
         VBox layout = new VBox(20, topBar, header, toggleButtons, contentPane);
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.TOP_CENTER);
         layout.setStyle("-fx-background-color: #ADD8E6;");
 
-        // Set up the scene and stage
         Scene scene = new Scene(layout, 1440, 740);
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        // Add Product functionality
         addProductButton.setOnAction(e -> {
             String name = productName.getText();
             String price = productPrice.getText();
@@ -240,7 +234,6 @@ public class DataEntry extends Application {
             }
         });
 
-        // Add Vendor functionality
         addVendorButton.setOnAction(e -> {
             String name = vendorName.getText();
             String contact = vendorContact.getText();
@@ -272,7 +265,6 @@ public class DataEntry extends Application {
         editLayout.setPadding(new Insets(20));
         editLayout.setAlignment(Pos.CENTER);
 
-        // Editable Fields
         TextField nameField = new TextField(document.getString("name"));
         nameField.setPromptText("Name");
 
@@ -293,7 +285,6 @@ public class DataEntry extends Application {
 
         Button saveButton = new Button("Save");
         saveButton.setOnAction(e -> {
-            // Update document with new values
             document.put("name", nameField.getText());
             if (isProduct) {
                 document.put("price", contactOrPriceField.getText());
@@ -307,14 +298,12 @@ public class DataEntry extends Application {
                 vendorCollection.replaceOne(new Document("_id", document.get("_id")), document);
             }
 
-            // Refresh Table
             table.getItems().clear();
             (isProduct ? productCollection : vendorCollection).find().forEach(table.getItems()::add);
 
             editStage.close();
         });
 
-        // Add fields to the layout
         editLayout.getChildren().add(nameField);
         editLayout.getChildren().add(contactOrPriceField);
         if (isProduct) {
@@ -322,7 +311,6 @@ public class DataEntry extends Application {
         }
         editLayout.getChildren().add(saveButton);
 
-        // Scene and Stage Setup
         Scene scene = new Scene(editLayout, 400, isProduct ? 400 : 200);
         editStage.setScene(scene);
         editStage.initModality(Modality.APPLICATION_MODAL);

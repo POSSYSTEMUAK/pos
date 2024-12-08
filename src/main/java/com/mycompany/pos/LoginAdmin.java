@@ -18,16 +18,15 @@ public class LoginAdmin extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Main layout using BorderPane
+
         BorderPane mainLayout = new BorderPane();
         mainLayout.setStyle("-fx-background-color: #FFFFFF;");
 
-        // Back Button in the Top-Left
         Button backButton = new Button("Back");
         backButton.setStyle("-fx-font-size: 14px; -fx-background-color: #000000; -fx-text-fill: white;");
         backButton.setOnAction(e -> {
-            new LoginForm().start(new Stage()); // Navigate back to LoginFrame
-            primaryStage.close(); // Close the current stage
+            new LoginForm().start(new Stage());
+            primaryStage.close();
         });
 
         HBox topBar = new HBox(backButton);
@@ -35,12 +34,10 @@ public class LoginAdmin extends Application {
         topBar.setAlignment(Pos.TOP_LEFT);
         mainLayout.setTop(topBar);
 
-        // Center Section: Image and Login Form
         VBox centerBox = new VBox();
         centerBox.setAlignment(Pos.CENTER);
         centerBox.setSpacing(20);
 
-        // Image
         Image image = new Image("file:images/sa.jpg/");
         ImageView imageView = new ImageView(image);
         imageView.setPreserveRatio(true);
@@ -54,12 +51,12 @@ public class LoginAdmin extends Application {
         loginGrid.setHgap(10);
         loginGrid.setVgap(10);
 
-        // Add Title
         Label titleLabel = new Label("Super Admin");
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         loginGrid.add(titleLabel, 0, 0, 2, 1);
+        GridPane.setHalignment(titleLabel, javafx.geometry.HPos.CENTER);
+        GridPane.setValignment(titleLabel, javafx.geometry.VPos.CENTER);
 
-        // Add Username Field
         Label usernameLabel = new Label("Name:");
         usernameLabel.setStyle("-fx-font-size: 20px;");
         loginGrid.add(usernameLabel, 0, 1);
@@ -67,7 +64,6 @@ public class LoginAdmin extends Application {
         usernameField.setPromptText("Enter username");
         loginGrid.add(usernameField, 1, 1);
 
-        // Add Password Field
         Label passwordLabel = new Label("Password:");
         passwordLabel.setStyle("-fx-font-size: 20px;");
         loginGrid.add(passwordLabel, 0, 2);
@@ -75,16 +71,13 @@ public class LoginAdmin extends Application {
         passwordField.setPromptText("Enter password");
         loginGrid.add(passwordField, 1, 2);
 
-        // Add Login Button
         Button loginButton = new Button("Login");
         loginGrid.add(loginButton, 1, 3);
 
-        // Add Message Label for Feedback
         Label messageLabel = new Label();
         messageLabel.setTextFill(Color.RED);
         loginGrid.add(messageLabel, 0, 4, 2, 1);
 
-        // Set Login Button Action
         loginButton.setOnAction(e -> {
             String username = usernameField.getText();
             String password = passwordField.getText();
@@ -92,7 +85,7 @@ public class LoginAdmin extends Application {
             if (validateAdmin(username, password)) {
                 messageLabel.setTextFill(Color.GREEN);
                 messageLabel.setText("Login successful!");
-                new SuperAdmin().start(new Stage()); // Opens SuperAdmin after successful login
+                new SuperAdmin().start(new Stage());
                 primaryStage.close();
             } else {
                 messageLabel.setTextFill(Color.RED);
@@ -103,7 +96,6 @@ public class LoginAdmin extends Application {
         centerBox.getChildren().add(loginGrid);
         mainLayout.setCenter(centerBox);
 
-        // Set up the scene and stage
         Scene scene = new Scene(mainLayout, 1440, 740);
         primaryStage.setTitle("Super Admin Login");
         primaryStage.setScene(scene);
@@ -114,7 +106,7 @@ public class LoginAdmin extends Application {
         MongoCollection<Document> collection = dbConnection.getAdminCollection();
         Document query = new Document("username", username).append("password", password);
         Document result = collection.find(query).first();
-        return result != null; // Returns true if a matching document is found
+        return result != null;
     }
 
     public static void main(String[] args) {

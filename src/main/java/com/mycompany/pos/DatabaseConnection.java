@@ -30,7 +30,4 @@ public class DatabaseConnection {
         return getDatabase().getCollection("products");
     }
 
-    public MongoCollection<Document> getVendorCollection() {
-        return getDatabase().getCollection("vendors");
-    }
 }
