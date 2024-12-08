@@ -21,8 +21,6 @@ A comprehensive **Point-of-Sale (POS)** system designed for Metro Cash and Carry
 
 #### Base Package: `com.mycompany.pos`
 - **BranchManager**: Manages branch-specific operations.
-- **BranchService**: Provides services related to branch functionality.
-- **EmployeeService**: Handles employee operations like adding and updating records.
 - **DatabaseConnection**: Ensures seamless database connectivity.
 - **DataEntry**: Facilitates vendor and product data entry.
 - **Pos**: The main entry point for the application.
